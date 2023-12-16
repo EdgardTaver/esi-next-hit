@@ -1,0 +1,1 @@
+USERS_DATABASE_FILE = "users.db"

@@ -1,9 +1,10 @@
 import sqlite3
 
 from app.infrastructure.password import encrypt_password
+from app.config import USERS_DATABASE_FILE
 
 def authenticate_user(email: str, password: str):
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect(USERS_DATABASE_FILE)
     cursor = conn.cursor()
 
     cursor.execute("SELECT password FROM users WHERE email=?", (email,))
@@ -17,8 +18,17 @@ def authenticate_user(email: str, password: str):
     return False
 
 def create_users_table():
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect(USERS_DATABASE_FILE)
     cursor = conn.cursor()
 
-    cursor.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT)")
+    create_statement = """
+    CREATE TABLE IF NOT EXISTS
+    users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT,
+        password TEXT
+    )
+    """
+
+    cursor.execute(create_statement)
     conn.commit()
