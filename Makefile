@@ -8,3 +8,8 @@ install:
 	pip install -r requirements.txt
 
 setup: venv activate install
+
+test:
+    pytest -v
+
+.PHONY: test
