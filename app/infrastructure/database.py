@@ -3,19 +3,6 @@ import sqlite3
 from app.infrastructure.password import encrypt_password
 from app.config import USERS_DATABASE_FILE
 
-def authenticate_user(email: str, password: str):
-    conn = sqlite3.connect(USERS_DATABASE_FILE)
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT password FROM users WHERE email=?", (email,))
-    result = cursor.fetchone()
-
-    if result is not None:
-        stored_password = result[0]
-        if encrypt_password(password) == stored_password:
-            return True
-
-    return False
 
 def start_users_database_connection() -> sqlite3.Connection:
     # TODO: integration test?
@@ -59,3 +46,15 @@ def register_user(connection: sqlite3.Connection, email: str, password: str):
         encrypted_password = encrypt_password(password)
         cursor.execute(insert_statement, (email, encrypted_password))
         connection.commit()
+
+def authenticate_user(connection: sqlite3.Connection, email: str, password: str):
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT password FROM users WHERE email=?", (email,))
+    result = cursor.fetchone()
+
+    if result is not None:
+        stored_password = result[0]
+        return encrypt_password(password) == stored_password
+
+    return False

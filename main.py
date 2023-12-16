@@ -22,16 +22,6 @@ def authenticate_user(email: str, password: str):
 
     return False
 
-def create_users_table():
-    conn = sqlite3.connect('users.db')
-    cursor = conn.cursor()
-
-    cursor.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT)")
-    conn.commit()
-
-def initialize_database():
-    create_users_table()
-
 @app.route('/login', methods=['POST']) #type:ignore
 def login():
     email = request.json.get("email")
