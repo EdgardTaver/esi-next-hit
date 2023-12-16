@@ -17,9 +17,14 @@ def authenticate_user(email: str, password: str):
 
     return False
 
-def create_users_table():
+def start_users_database_connection() -> sqlite3.Connection:
+    # TODO: integration test?
     conn = sqlite3.connect(USERS_DATABASE_FILE)
-    cursor = conn.cursor()
+    return conn
+
+
+def create_users_table(connection: sqlite3.Connection):
+    cursor = connection.cursor()
 
     create_statement = """
     CREATE TABLE IF NOT EXISTS
@@ -31,4 +36,5 @@ def create_users_table():
     """
 
     cursor.execute(create_statement)
-    conn.commit()
+    connection.commit()
+    # TODO: should it really commit here?
