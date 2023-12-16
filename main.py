@@ -4,11 +4,11 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-def encrypt_password(password):
+def encrypt_password(password: str):
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     return hashed_password
 
-def authenticate_user(username, password):
+def authenticate_user(username: str, password: str):
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
 
@@ -22,10 +22,10 @@ def authenticate_user(username, password):
 
     return False
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST']) #type:ignore
 def login():
-    username = request.json.get('username')
-    password = request.json.get('password')
+    username = request.json.get("username")
+    password = request.json.get("password")
 
     if authenticate_user(username, password):
         return jsonify({'message': 'Login successful'})
@@ -34,4 +34,3 @@ def login():
 
 if __name__ == '__main__':
     app.run()
-
