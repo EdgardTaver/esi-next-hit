@@ -22,6 +22,16 @@ def authenticate_user(email: str, password: str):
 
     return False
 
+def create_users_table():
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+
+    cursor.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT)")
+    conn.commit()
+
+def initialize_database():
+    create_users_table()
+
 @app.route('/login', methods=['POST']) #type:ignore
 def login():
     email = request.json.get("email")
@@ -52,6 +62,17 @@ def register():
     conn.commit()
 
     return jsonify({'message': 'User registered successfully'})
+
+@app.route('/protected', methods=['GET'])
+def protected():
+    if not getattr(g, 'logged_in', False):
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    return jsonify({'message': 'Protected endpoint'})
+
+if __name__ == '__main__':
+    initialize_database()
+    app.run()
 
 @app.route('/protected', methods=['GET'])
 def protected():
