@@ -1,33 +1,17 @@
-import hashlib
 import sqlite3
 from flask import Flask, request, jsonify, g
 
+from app.infrastructure.database import create_users_table, register_user, authenticate_user, start_users_database_connection
+from app.exceptions import EmailAlreadyRegisteredException
+
 app = Flask(__name__)
-
-def encrypt_password(password: str):
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    return hashed_password
-
-def authenticate_user(email: str, password: str):
-    conn = sqlite3.connect('users.db')
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT password FROM users WHERE email=?", (email,))
-    result = cursor.fetchone()
-
-    if result is not None:
-        stored_password = result[0]
-        if encrypt_password(password) == stored_password:
-            return True
-
-    return False
 
 @app.route('/login', methods=['POST']) #type:ignore
 def login():
     email = request.json.get("email")
     password = request.json.get("password")
 
-    if authenticate_user(email, password):
+    if authenticate_user(g.users_database_connection, email, password):
         g.logged_in = True
         return jsonify({'message': 'Login successful'})
     else:
@@ -38,20 +22,13 @@ def register():
     email = request.json.get("email")
     password = request.json.get("password")
 
-    conn = sqlite3.connect('users.db')
-    cursor = conn.cursor()
+    try:
+        register_user(g.users_database_connection, email, password)
+        return jsonify({'message': 'User registered successfully'})
+    
+    except EmailAlreadyRegisteredException:
+        return jsonify({'message': 'Email already registered'}), 400
 
-    cursor.execute("SELECT * FROM users WHERE email=?", (email,))
-    result = cursor.fetchone()
-
-    if result is not None:
-        return jsonify({'message': 'Email already exists'})
-
-    hashed_password = encrypt_password(password)
-    cursor.execute("INSERT INTO users (email, password) VALUES (?, ?)", (email, hashed_password))
-    conn.commit()
-
-    return jsonify({'message': 'User registered successfully'})
 
 @app.route('/protected', methods=['GET'])
 def protected():
@@ -61,16 +38,10 @@ def protected():
     return jsonify({'message': 'Protected endpoint'})
 
 if __name__ == '__main__':
-    initialize_database()
-    app.run()
+    connection = start_users_database_connection()
+    g.users_database_connection = connection
+    
+    create_users_table(g.users_database_connection)
 
-@app.route('/protected', methods=['GET'])
-def protected():
-    if not getattr(g, 'logged_in', False):
-        return jsonify({'message': 'Unauthorized'}), 401
-
-    return jsonify({'message': 'Protected endpoint'})
-
-if __name__ == '__main__':
     app.run()
 
