@@ -8,11 +8,11 @@ def encrypt_password(password: str):
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
     return hashed_password
 
-def authenticate_user(username: str, password: str):
+def authenticate_user(email: str, password: str):
     conn = sqlite3.connect('users.db')
     cursor = conn.cursor()
 
-    cursor.execute("SELECT password FROM users WHERE username=?", (username,))
+    cursor.execute("SELECT password FROM users WHERE email=?", (email,))
     result = cursor.fetchone()
 
     if result is not None:
@@ -24,14 +24,34 @@ def authenticate_user(username: str, password: str):
 
 @app.route('/login', methods=['POST']) #type:ignore
 def login():
-    username = request.json.get("username")
+    email = request.json.get("email")
     password = request.json.get("password")
 
-    if authenticate_user(username, password):
+    if authenticate_user(email, password):
         g.logged_in = True
         return jsonify({'message': 'Login successful'})
     else:
-        return jsonify({'message': 'Invalid username or password'})
+        return jsonify({'message': 'Invalid email or password'})
+
+@app.route('/register', methods=['POST'])
+def register():
+    email = request.json.get("email")
+    password = request.json.get("password")
+
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+    result = cursor.fetchone()
+
+    if result is not None:
+        return jsonify({'message': 'Email already exists'})
+
+    hashed_password = encrypt_password(password)
+    cursor.execute("INSERT INTO users (email, password) VALUES (?, ?)", (email, hashed_password))
+    conn.commit()
+
+    return jsonify({'message': 'User registered successfully'})
 
 @app.route('/protected', methods=['GET'])
 def protected():
