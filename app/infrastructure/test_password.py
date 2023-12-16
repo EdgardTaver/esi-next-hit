@@ -1,8 +1,8 @@
 from password import encrypt_password
 
 def test_encrypt_password():
-    password = "my_password"
-    expected_hash = "f6e248ea994f3e342f61141b8b8e3ede86d4de53257abc8d06ae07a1da73fb39"
+    password = "cachorro_bananinha"
+    expected_hash = "87ec165034ec6bbf63c9423f1a226b53d4d1fbef98297483e0bbb1c7f3bf46de"
     
     hashed_password = encrypt_password(password)
     
