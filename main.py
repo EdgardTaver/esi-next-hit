@@ -1,6 +1,6 @@
 import hashlib
 import sqlite3
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, g
 
 app = Flask(__name__)
 
@@ -28,9 +28,18 @@ def login():
     password = request.json.get("password")
 
     if authenticate_user(username, password):
+        g.logged_in = True
         return jsonify({'message': 'Login successful'})
     else:
         return jsonify({'message': 'Invalid username or password'})
 
+@app.route('/protected', methods=['GET'])
+def protected():
+    if not getattr(g, 'logged_in', False):
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    return jsonify({'message': 'Protected endpoint'})
+
 if __name__ == '__main__':
     app.run()
+
