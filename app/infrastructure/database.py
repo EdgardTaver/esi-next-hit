@@ -2,6 +2,7 @@ import sqlite3
 
 from app.infrastructure.password import encrypt_password
 from app.config import USERS_DATABASE_FILE
+from app.exceptions import EmailAlreadyRegisteredException
 
 
 def start_users_database_connection() -> sqlite3.Connection:
@@ -25,7 +26,6 @@ def create_users_table(connection: sqlite3.Connection):
     cursor.execute(create_statement)
     connection.commit()
 
-
 def register_user(connection: sqlite3.Connection, email: str, password: str):
     cursor = connection.cursor()
 
@@ -36,15 +36,17 @@ def register_user(connection: sqlite3.Connection, email: str, password: str):
     cursor.execute(select_statement, (email,))
     result = cursor.fetchone()
 
-    if result is None:
-        insert_statement = """
-        INSERT INTO users (email, password)
-        VALUES (?, ?)
-        """
+    if result is not None:
+        raise EmailAlreadyRegisteredException()
 
-        encrypted_password = encrypt_password(password)
-        cursor.execute(insert_statement, (email, encrypted_password))
-        connection.commit()
+    insert_statement = """
+    INSERT INTO users (email, password)
+    VALUES (?, ?)
+    """
+
+    encrypted_password = encrypt_password(password)
+    cursor.execute(insert_statement, (email, encrypted_password))
+    connection.commit()
 
 def authenticate_user(connection: sqlite3.Connection, email: str, password: str):
     cursor = connection.cursor()
