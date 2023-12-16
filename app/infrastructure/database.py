@@ -24,8 +24,7 @@ def create_users_table(connection: sqlite3.Connection):
 
     cursor.execute(create_statement)
     connection.commit()
-    # TODO: should it really commit here?
-    # multiple commits should be possible, or then we restructure the app to avoid this
+
 
 def register_user(connection: sqlite3.Connection, email: str, password: str):
     cursor = connection.cursor()
