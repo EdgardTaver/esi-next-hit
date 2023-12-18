@@ -16,13 +16,13 @@ from streamlit_option_menu import option_menu
 from streamlit_searchbox import st_searchbox
 
 from app.frontend.bff import (do_create_playlist, do_list_playlists, do_login,
-                              do_logout, do_register, do_search, do_show_playlist)
+                              do_logout, do_register, do_search,
+                              do_show_playlist)
 from app.frontend.components import list_musics
-
-SESSION_USER_ID = "user_id"
-SESSION_SHOULD_DISPLAY_LOGIN = "should_display_login_success"
-SESSION_SHOULD_DISPLAY_LOGOUT = "should_display_logout_message"
-SESSION_SHOULD_EXPLORE_PLAYLIST = "should_explore_playlist"
+from app.frontend.session import (SESSION_SHOULD_DISPLAY_LOGIN,
+                                  SESSION_SHOULD_DISPLAY_LOGOUT,
+                                  SESSION_SHOULD_EXPLORE_PLAYLIST,
+                                  SESSION_USER_ID)
 
 if SESSION_USER_ID not in st.session_state:
     st.session_state[SESSION_USER_ID] = 5
@@ -86,8 +86,7 @@ if selected=="Playlists":
         if len(musics) == 0:
             st.warning("Playlist vazia")
         else:
-            for music in musics:
-                list_musics(musics, False)
+            list_musics(musics, False)
 
         st.subheader("Adicionar músicas à playlist")
         title = st.text_input("Procure por uma música...", "")

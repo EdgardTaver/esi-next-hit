@@ -105,17 +105,17 @@ def endpoint_list_playlists():
     finally:
         connection.close()
 
-@app.route("/playlist/add-music", methods=['POST']) # type:ignore
-def endpoint_add_music_to_playlist():
-    user_id = session.get("USER_ID")
-
-    if not user_id:
-        return jsonify({'message': 'User not logged in'}), 401
-
+@app.route("/playlist/<playlist_id>/add-music", methods=['POST']) # type:ignore
+def endpoint_add_music_to_playlist(playlist_id: int):
     connection = start_users_database_connection()
     try:
-        playlist_id = request.json.get("playlist_id")
+        if not playlist_id:
+            return jsonify({'message': 'Missing playlist id'}), 400
+        
         music_id = request.json.get("music_id")
+        if not music_id:
+            return jsonify({'message': 'Missing music_id'}), 400
+        
         register_music_in_playlist(connection, playlist_id, music_id)
         return jsonify({'message': 'Music added successfully to playlist'})
     
