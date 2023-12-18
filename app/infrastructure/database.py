@@ -60,6 +60,23 @@ def create_playlists_table(connection: sqlite3.Connection):
     connection.commit()
 
 
+def create_playlist_music_table(connection: sqlite3.Connection):
+    cursor = connection.cursor()
+
+    create_statement = """
+    CREATE TABLE IF NOT EXISTS
+    playlist_music (
+        playlist_id INTEGER,
+        music_id INTEGER,
+        FOREIGN KEY (playlist_id) REFERENCES playlists (id),
+        FOREIGN KEY (music_id) REFERENCES musics (id)
+    )
+    """
+
+    cursor.execute(create_statement)
+    connection.commit()
+
+
 def register_user(connection: sqlite3.Connection, email: str, password: str):
     cursor = connection.cursor()
 
