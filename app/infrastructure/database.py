@@ -36,7 +36,8 @@ def create_music_table(connection: sqlite3.Connection):
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT,
         artist TEXT,
-        genre TEXT
+        genre TEXT,
+        image_url TEXT
     )
     """
 
