@@ -11,35 +11,24 @@ TODOs:
 - [ ] Derive configs from app.config file
 """
 
-from typing import Any, List, Optional
 import streamlit as st
 from streamlit_option_menu import option_menu
 from streamlit_searchbox import st_searchbox
-import requests
 
-MUSIC_SEARCH_ENDPOINT = "http://127.0.0.1:5000/music/search"
-LOGIN_ENDPOINT = "http://127.0.0.1:5000/user/login"
-CHECK_LOGIN_ENDPOINT = "http://127.0.0.1:5000/user/is-logged"
-REGISTER_ENDPOINT = "http://127.0.0.1:5000/user/register"
-LOGOUT_ENDPOINT = "http://127.0.0.1:5000/user/logout"
+from app.frontend.bff import do_login, do_logout, do_register, do_search
 
-def do_check_login():
-    response = requests.get(CHECK_LOGIN_ENDPOINT)
-    if response.status_code == 200:
-        response_json = response.json()
-        if response_json["is_logged"] == True:
-            return True
-    
-    return False
+SESSION_USER_ID = "user_id"
+SESSION_SHOULD_DISPLAY_LOGIN = "should_display_login_success"
+SESSION_SHOULD_DISPLAY_LOGOUT = "should_display_logout_message"
 
-if "user_id" not in st.session_state:
-    st.session_state["user_id"] = None
+if SESSION_USER_ID not in st.session_state:
+    st.session_state[SESSION_USER_ID] = None
 
-if "should_display_login_success" not in st.session_state:
-    st.session_state["should_display_login_success"] = False
+if SESSION_SHOULD_DISPLAY_LOGIN not in st.session_state:
+    st.session_state[SESSION_SHOULD_DISPLAY_LOGIN] = False
 
-if "should_display_logout_message" not in st.session_state:
-    st.session_state["should_display_logout_message"] = False
+if SESSION_SHOULD_DISPLAY_LOGOUT not in st.session_state:
+    st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT] = False
 
 st.set_page_config(page_title="NextHit", page_icon=":musical_note:", layout="centered")
 
@@ -53,42 +42,6 @@ selected = option_menu(
     icons=["globe", "music-note-list", "person"],
     orientation="horizontal",
 )
-
-def do_search(search_param: str) -> List[Any]:
-    params = {"q": search_param}
-    response = requests.get(MUSIC_SEARCH_ENDPOINT, params=params)
-
-    if response.status_code != 200:
-        return []
-
-    return response.json()
-
-def do_login(email: str, password: str) -> Optional[int]:
-    payload = {"email": email, "password": password}
-    response = requests.post(LOGIN_ENDPOINT, json=payload)
-    
-    if response.status_code != 200:
-        return None
-    
-    return response.json()["user_id"]
-
-def do_register(email: str, password: str) -> Optional[int]:
-    payload = {"email": email, "password": password}
-    response = requests.post(REGISTER_ENDPOINT, json=payload)
-    
-    if response.status_code != 200:
-        return None
-    
-    return response.json()["user_id"]
-
-def do_logout() -> bool:
-    response = requests.get(LOGOUT_ENDPOINT)
-    
-    if response.status_code != 200:
-        return False
-    
-    return True
-
 
 if selected=="Descobrir":
     title = st.text_input("Procure por uma música...", "")
@@ -123,15 +76,15 @@ if selected=="Playlists":
     st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Mix melhores", "Chiclete", "Relaxando", "Focado"], width=150)
 
 if selected=="Perfil":
-    if st.session_state["should_display_login_success"]:
+    if st.session_state[SESSION_SHOULD_DISPLAY_LOGIN]:
         st.success("Login realizado com sucesso!")
-        st.session_state["should_display_login_success"] = False
+        st.session_state[SESSION_SHOULD_DISPLAY_LOGIN] = False
     
-    if st.session_state["should_display_logout_message"]:
+    if st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT]:
         st.warning("Logout realizado com sucesso. Até breve!")
-        st.session_state["should_display_logout_message"] = False
+        st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT] = False
     
-    if st.session_state["user_id"] is not None :
+    if st.session_state[SESSION_USER_ID] is not None :
         
         st.write("Olá!")
         # TODO: add more info
@@ -141,8 +94,8 @@ if selected=="Perfil":
             if not response:
                 st.error("Erro ao fazer logout")
             else:
-                st.session_state["user_id"] = None
-                st.session_state["should_display_logout_message"] = True
+                st.session_state[SESSION_USER_ID] = None
+                st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT] = True
     
     else:
         with st.form(key="login_form"):
@@ -157,8 +110,8 @@ if selected=="Perfil":
                 if not login_response:
                     st.error("E-mail ou senha inválidos.")
                 else:
-                    st.session_state["user_id"] = login_response
-                    st.session_state["should_display_login_success"] = True
+                    st.session_state[SESSION_USER_ID] = login_response
+                    st.session_state[SESSION_SHOULD_DISPLAY_LOGIN] = True
         
         with st.form(key="register_form"):
             st.subheader("Não possui uma conta? Cadastre-se!")
@@ -172,8 +125,8 @@ if selected=="Perfil":
                 if not register_response:
                     st.error("E-mail já cadastrado.")
                 else:
-                    st.session_state["user_id"] = register_response
-                    st.session_state["should_display_login_success"] = True
+                    st.session_state[SESSION_USER_ID] = register_response
+                    st.session_state[SESSION_SHOULD_DISPLAY_LOGIN] = True
 
     # st.subheader("Nome do Perfil")
     # st.image("axolote.jpg", width=100)

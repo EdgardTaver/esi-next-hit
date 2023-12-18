@@ -2,6 +2,8 @@
     "cSpell.words": [
         "jsonify",
         "lastrowid",
-        "sqlite"
+        "searchbox",
+        "sqlite",
+        "streamlit"
     ]
 }
