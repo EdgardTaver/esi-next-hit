@@ -249,3 +249,28 @@ def test_search_music_regular_scenario():
     assert results[2]["image_url"] == "url/image_2"
     
     # should be ordered by title and id
+
+
+def test_search_music_no_entries_found():
+    connection = start_sqlite_in_memory_database_connection()
+    create_music_table(connection)
+
+    register_music(connection, "Calabasas", "Tritonal", "electronic music", "url/image_1")
+
+    results = search_music(connection, "bohemian")
+    assert len(results) == 0
+
+
+def test_search_music_case_insensitivity():
+    connection = start_sqlite_in_memory_database_connection()
+    create_music_table(connection)
+
+    register_music(connection, "Sorry", "Justin Bieber", "norwegian black metal", "url/image_1")
+    register_music(connection, "SORRY", "Justin Bieber", "norwegian black metal", "url/image_1")
+    register_music(connection, "sorry", "Justin Bieber", "norwegian black metal", "url/image_1")
+
+    results = search_music(connection, "sOrRy")
+    assert len(results) == 3
+    assert results[0]["title"] == "Sorry"
+    assert results[1]["title"] == "SORRY"
+    assert results[2]["title"] == "sorry"

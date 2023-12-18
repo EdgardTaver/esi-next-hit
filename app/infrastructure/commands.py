@@ -118,7 +118,7 @@ def search_music(connection: sqlite3.Connection, search_string: str):
 
     select_music_statement = """
     SELECT * FROM musics WHERE title LIKE ?
-    ORDER BY title ASC, id ASC
+    ORDER BY LOWER(title) ASC, id ASC
     LIMIT 10
     """
     cursor.execute(select_music_statement, ('%' + search_string + '%',))
