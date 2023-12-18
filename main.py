@@ -33,8 +33,10 @@ def endpoint_login():
 @app.route("/user/is-logged", methods=["GET"]) # type:ignore
 def endpoint_is_logged():
     user_id = session.get("USER_ID")
+
     if user_id:
         return jsonify({'is_logged': True})
+    
     else:
         return jsonify({'is_logged': False})
 
@@ -51,8 +53,8 @@ def endpoint_register():
 
     connection = start_users_database_connection()
     try:
-        register_user(connection, email, password)
-        return jsonify({'message': 'User registered successfully'})
+        user_id = register_user(connection, email, password)
+        return jsonify({'message': 'User registered successfully', 'user_id': user_id})
     
     except EmailAlreadyRegisteredException:
         return jsonify({'message': 'Email already registered'}), 400

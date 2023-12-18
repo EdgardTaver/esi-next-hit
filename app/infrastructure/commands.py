@@ -9,7 +9,7 @@ from app.exceptions import (EmailAlreadyRegisteredException,
 from app.infrastructure.password import encrypt_password
 
 
-def register_user(connection: sqlite3.Connection, email: str, password: str):
+def register_user(connection: sqlite3.Connection, email: str, password: str) -> Optional[int]:
     cursor = connection.cursor()
 
     select_statement = """
@@ -29,8 +29,12 @@ def register_user(connection: sqlite3.Connection, email: str, password: str):
 
     encrypted_password = encrypt_password(password)
     cursor.execute(insert_statement, (email, encrypted_password))
-    cursor.close()
     connection.commit()
+
+    inserted_user_id = cursor.lastrowid
+    cursor.close()
+
+    return inserted_user_id
 
 
 def get_authenticated_user_id(connection: sqlite3.Connection, email: str, password: str) -> Optional[int]:

@@ -21,7 +21,8 @@ def test_register_user_when_email_is_new():
 
     new_email = "test@example.com"
     new_password = "password123"
-    register_user(connection, new_email, new_password)
+    exercise = register_user(connection, new_email, new_password)
+    assert exercise == 1
 
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM users WHERE email=?", (new_email,))
