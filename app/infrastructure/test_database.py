@@ -4,7 +4,7 @@ from app.exceptions import EmailAlreadyRegisteredException
 import pytest
 
 
-def test_create_users_table():
+def test_create_users_table_when_table_does_not_exist():
     connection = start_sqlite_in_memory_database_connection()
     cursor = connection.cursor()
     
@@ -16,6 +16,17 @@ def test_create_users_table():
     cursor.close()
 
     assert result is not None
+
+def test_create_users_table_when_table_already_exists():
+    connection = start_sqlite_in_memory_database_connection()
+    create_users_table(connection)
+
+    try:
+        create_users_table(connection)
+        assert True
+    except Exception:
+        assert False, "should not raise exception when table already exists"
+
 
 def test_register_user_when_email_is_new():
     connection = start_sqlite_in_memory_database_connection()
