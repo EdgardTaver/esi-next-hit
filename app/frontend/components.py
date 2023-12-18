@@ -2,7 +2,7 @@ from typing import Any, Callable, Dict, List
 
 import streamlit as st
 
-from app.frontend.bff import do_add_music_to_playlist
+from app.frontend.bff import do_add_music_to_playlist, do_search
 from app.frontend.session import (SESSION_CLEAR_SEARCH_RESULTS,
                                   SESSION_SHOULD_DISPLAY_MUSIC_ADDED,
                                   SESSION_SHOULD_EXPLORE_PLAYLIST)
@@ -35,3 +35,12 @@ def list_musics(musics: List[Dict[str, Any]], interaction_button: Callable[[Any,
 
         interaction_button(col2, music["id"])
 
+def music_search_box(interaction_button: Callable[[Any, int], None] = no_op_button):
+    music_search_term = st.text_input("Procure por uma música...", "")
+    if music_search_term and not st.session_state[SESSION_CLEAR_SEARCH_RESULTS]:
+        results = do_search(music_search_term)
+        if len(results) == 0:
+            st.error("Nenhuma música encontrada")
+        
+        else:
+            list_musics(results, interaction_button)

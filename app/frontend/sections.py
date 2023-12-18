@@ -3,7 +3,7 @@ import streamlit as st
 from app.frontend.bff import (do_create_playlist, do_list_playlists, do_login,
                               do_logout, do_register, do_search,
                               do_show_playlist)
-from app.frontend.components import add_to_playlist_button, list_musics
+from app.frontend.components import add_to_playlist_button, list_musics, music_search_box
 from app.frontend.session import (SESSION_CLEAR_SEARCH_RESULTS,
                                   SESSION_PLAYLIST_BEING_EXPLORED,
                                   SESSION_SHOULD_DISPLAY_LOGIN,
@@ -41,14 +41,8 @@ def explore_playlist_section():
         list_musics(musics)
 
     st.subheader("Adicionar músicas à playlist")
-    title = st.text_input("Procure por uma música...", "")
-    if title and not st.session_state[SESSION_CLEAR_SEARCH_RESULTS]:
-        results = do_search(title)
-        if len(results) == 0:
-            st.error("Nenhuma música encontrada")
-        
-        else:
-            list_musics(results, add_to_playlist_button)
+    
+    music_search_box(add_to_playlist_button)
 
     st.session_state[SESSION_CLEAR_SEARCH_RESULTS] = False
 
