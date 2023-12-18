@@ -21,8 +21,7 @@ def login():
         session["USER_ID"] = user_id
         return jsonify({'message': 'Login successful', 'user_id': user_id})
     else:
-        return jsonify({'message': 'Invalid email or password'})
-    
+        return jsonify({'message': 'Invalid email or password'}), 401
 
 @app.route('/logout', methods=['POST']) # type:ignore
 def logout():
