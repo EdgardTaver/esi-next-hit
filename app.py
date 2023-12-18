@@ -19,8 +19,9 @@ from app.frontend.bff import (do_create_playlist, do_list_playlists, do_login,
                               do_logout, do_register, do_search,
                               do_show_playlist)
 from app.frontend.components import list_musics
-from app.frontend.session import (SESSION_SHOULD_DISPLAY_LOGIN,
+from app.frontend.session import (SESSION_CLEAR_SEARCH_RESULTS, SESSION_SHOULD_DISPLAY_LOGIN,
                                   SESSION_SHOULD_DISPLAY_LOGOUT,
+                                  SESSION_SHOULD_DISPLAY_MUSIC_ADDED,
                                   SESSION_SHOULD_EXPLORE_PLAYLIST,
                                   SESSION_USER_ID)
 
@@ -36,6 +37,12 @@ if SESSION_SHOULD_DISPLAY_LOGOUT not in st.session_state:
 
 if SESSION_SHOULD_EXPLORE_PLAYLIST not in st.session_state:
     st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] = None
+
+if SESSION_SHOULD_DISPLAY_MUSIC_ADDED not in st.session_state:
+    st.session_state[SESSION_SHOULD_DISPLAY_MUSIC_ADDED] = False
+
+if SESSION_CLEAR_SEARCH_RESULTS not in st.session_state:
+    st.session_state[SESSION_CLEAR_SEARCH_RESULTS] = False
 
 st.set_page_config(page_title="NextHit", page_icon=":musical_note:", layout="centered")
 
@@ -82,6 +89,10 @@ if selected=="Playlists":
 
         st.header(f"Explorando playlist {st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST]}")
 
+        if st.session_state[SESSION_SHOULD_DISPLAY_MUSIC_ADDED]:
+            st.success("Música adicionada com sucesso!")
+            st.session_state[SESSION_SHOULD_DISPLAY_MUSIC_ADDED] = False
+
         musics = do_show_playlist(st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST])
         if len(musics) == 0:
             st.warning("Playlist vazia")
@@ -90,13 +101,15 @@ if selected=="Playlists":
 
         st.subheader("Adicionar músicas à playlist")
         title = st.text_input("Procure por uma música...", "")
-        if title:
+        if title and not st.session_state[SESSION_CLEAR_SEARCH_RESULTS]:
             results = do_search(title)
             if len(results) == 0:
                 st.error("Nenhuma música encontrada")
             
             else:
                 list_musics(results, True)
+
+        st.session_state[SESSION_CLEAR_SEARCH_RESULTS] = False
 
     else:
         with st.form(key="create_playlist_form"):

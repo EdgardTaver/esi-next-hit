@@ -3,11 +3,9 @@ from typing import Any, Dict, List
 import streamlit as st
 
 from app.frontend.bff import do_add_music_to_playlist
-from app.frontend.session import SESSION_SHOULD_EXPLORE_PLAYLIST
+from app.frontend.session import SESSION_SHOULD_DISPLAY_MUSIC_ADDED, SESSION_SHOULD_EXPLORE_PLAYLIST, SESSION_CLEAR_SEARCH_RESULTS
 
 def list_musics(musics: List[Dict[str, Any]], show_add_to_playlist: bool):
-    print(musics)
-
     for music in musics:
         col1, col2 = st.columns((1,2.75))
         col1.image(music["image_url"], width=150)
@@ -25,7 +23,6 @@ def list_musics(musics: List[Dict[str, Any]], show_add_to_playlist: bool):
                 if not response:
                     st.error("Erro ao adicionar música à playlist.")
                 else:
-                    st.success("Música adicionada com sucesso!")
-                
-                # st.rerun()
-
+                    st.session_state[SESSION_SHOULD_DISPLAY_MUSIC_ADDED] = True
+                    st.session_state[SESSION_CLEAR_SEARCH_RESULTS] = True
+                    st.rerun()
