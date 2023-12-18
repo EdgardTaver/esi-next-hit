@@ -17,65 +17,70 @@ def playlist_section():
         st.error("Faça login para criar uma playlist")
 
     elif st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] is not None:
-        if st.button(key="playlist_exploring_go_back", label="Voltar"):
-            st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] = None
-            st.session_state[SESSION_PLAYLIST_BEING_EXPLORED] = None
-            st.rerun()
-
-        st.header(st.session_state[SESSION_PLAYLIST_BEING_EXPLORED])
-
-        if st.session_state[SESSION_SHOULD_DISPLAY_MUSIC_ADDED]:
-            st.success("Música adicionada com sucesso!")
-            st.session_state[SESSION_SHOULD_DISPLAY_MUSIC_ADDED] = False
-
-        musics = do_show_playlist(st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST])
-        if len(musics) == 0:
-            st.warning("Playlist vazia")
-        else:
-            list_musics(musics)
-
-        st.subheader("Adicionar músicas à playlist")
-        title = st.text_input("Procure por uma música...", "")
-        if title and not st.session_state[SESSION_CLEAR_SEARCH_RESULTS]:
-            results = do_search(title)
-            if len(results) == 0:
-                st.error("Nenhuma música encontrada")
-            
-            else:
-                list_musics(results, add_to_playlist_button)
-
-        st.session_state[SESSION_CLEAR_SEARCH_RESULTS] = False
+        explore_playlist_section()
 
     else:
-        with st.form(key="create_playlist_form"):
-            st.subheader("Crie uma playlist")
-            name = st.text_input("Nome da playlist")
-            submitted = st.form_submit_button("Criar")
-            if submitted:
-                response = do_create_playlist(st.session_state[SESSION_USER_ID], name)
-                if not response:
-                    st.error("Erro ao criar playlist.")
-                else:
-                    st.success("Playlist criada com sucesso!")
-        
+        list_playlists_section()
 
-        st.subheader("Playlists salvas")
-        playlists = do_list_playlists(st.session_state[SESSION_USER_ID])
-        if len(playlists) == 0:
-            st.warning("Nenhuma playlist encontrada")
+def explore_playlist_section():
+    if st.button(key="playlist_exploring_go_back", label="Voltar"):
+        st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] = None
+        st.session_state[SESSION_PLAYLIST_BEING_EXPLORED] = None
+        st.rerun()
+
+    st.header(st.session_state[SESSION_PLAYLIST_BEING_EXPLORED])
+
+    if st.session_state[SESSION_SHOULD_DISPLAY_MUSIC_ADDED]:
+        st.success("Música adicionada com sucesso!")
+        st.session_state[SESSION_SHOULD_DISPLAY_MUSIC_ADDED] = False
+
+    musics = do_show_playlist(st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST])
+    if len(musics) == 0:
+        st.warning("Playlist vazia")
+    else:
+        list_musics(musics)
+
+    st.subheader("Adicionar músicas à playlist")
+    title = st.text_input("Procure por uma música...", "")
+    if title and not st.session_state[SESSION_CLEAR_SEARCH_RESULTS]:
+        results = do_search(title)
+        if len(results) == 0:
+            st.error("Nenhuma música encontrada")
         
         else:
-            for playlist in playlists:
-                col1, col2 = st.columns((1,2.75))
-                col1.image("playlist.jpg", width=150)
-                col2.subheader(playlist["name"])
+            list_musics(results, add_to_playlist_button)
 
-                unique_button_key = f"explore_{playlist['id']}"
-                if col2.button(key=unique_button_key, label="Explorar"):
-                    st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] = playlist["id"]
-                    st.session_state[SESSION_PLAYLIST_BEING_EXPLORED] = playlist["name"]
-                    st.rerun()
+    st.session_state[SESSION_CLEAR_SEARCH_RESULTS] = False
 
+def list_playlists_section():
+    with st.form(key="create_playlist_form"):
+        st.subheader("Crie uma playlist")
+        name = st.text_input("Nome da playlist")
+        submitted = st.form_submit_button("Criar")
+        if submitted:
+            response = do_create_playlist(st.session_state[SESSION_USER_ID], name)
+            if not response:
+                st.error("Erro ao criar playlist.")
+            else:
+                st.success("Playlist criada com sucesso!")
+    
+
+    st.subheader("Playlists salvas")
+    playlists = do_list_playlists(st.session_state[SESSION_USER_ID])
+    if len(playlists) == 0:
+        st.warning("Nenhuma playlist encontrada")
+    
+    else:
+        for playlist in playlists:
+            col1, col2 = st.columns((1,2.75))
+            col1.image("playlist.jpg", width=150)
+            col2.subheader(playlist["name"])
+
+            unique_button_key = f"explore_{playlist['id']}"
+            if col2.button(key=unique_button_key, label="Explorar"):
+                st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] = playlist["id"]
+                st.session_state[SESSION_PLAYLIST_BEING_EXPLORED] = playlist["name"]
+                st.rerun()
 
 def profile_section():
     if st.session_state[SESSION_SHOULD_DISPLAY_LOGIN]:

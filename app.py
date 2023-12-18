@@ -9,7 +9,7 @@ from streamlit_option_menu import option_menu
 
 from app.frontend.bff import do_search
 from app.frontend.components import list_musics
-from app.frontend.session import initialize_session_variables)
+from app.frontend.session import initialize_session_variables
 
 from app.frontend.sections import playlist_section, profile_section
 
