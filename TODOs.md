@@ -6,6 +6,7 @@
   - [X] Criação de playlists.
   - [ ] Músicas semelhantes.
   - [ ] Playlists automáticas (estou considerando não fazer...)
+  - [ ] Generates OpenAPI documentation.
 
 - [ ] Possíveis testes (para vídeo):
   - [ ] Tentar longar com conta que existe, mas senha errada.
