@@ -6,9 +6,11 @@ from app.exceptions import (EmailAlreadyRegisteredException,
                             PlaylistAlreadyExistsException,
                             PlaylistNotFoundException)
 from app.infrastructure.commands import (get_authenticated_user_id,
+                                         list_musics_in_playlist,
+                                         list_playlists_for_user,
                                          register_music_in_playlist,
                                          register_playlist, register_user,
-                                         search_music, list_playlists_for_user)
+                                         search_music)
 from app.infrastructure.database import start_users_database_connection
 
 app = Flask(__name__)
@@ -125,6 +127,22 @@ def endpoint_add_music_to_playlist():
     
     except MusicAlreadyInPlaylistException:
         return jsonify({'message': 'Music already added to playlist'}), 400
+
+    finally:
+        connection.close()
+
+@app.route("/playlist/<playlist_id>/show", methods=['GET']) # type:ignore
+def endpoint_show_playlist(playlist_id: int):
+    connection = start_users_database_connection()
+    try:
+        if not playlist_id:
+            return jsonify({'message': 'Missing playlist id'}), 400
+
+        musics = list_musics_in_playlist(connection, playlist_id)
+        return jsonify(musics)
+    
+    except Exception:
+        return jsonify({'message': 'Unexpected issue'}), 500
 
     finally:
         connection.close()
