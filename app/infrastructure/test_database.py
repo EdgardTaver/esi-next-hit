@@ -82,7 +82,7 @@ def test_authenticate_user_when_email_is_not_registered():
     any_password = "password456"
 
     result = authenticate_user(connection, non_existing_email, any_password)
-    assert result is False
+    assert result is None
 
 def test_authenticate_user_when_email_exists_but_password_is_incorrect():
     connection = start_sqlite_in_memory_database_connection()
@@ -94,7 +94,7 @@ def test_authenticate_user_when_email_exists_but_password_is_incorrect():
 
     wrong_password = "cachorro_banana"
     result = authenticate_user(connection, existing_email, wrong_password)
-    assert result is False
+    assert result is None
 
 def test_authenticate_user_when_email_exists_and_password_is_correct():
     connection = start_sqlite_in_memory_database_connection()
