@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.secret_key = "my-next-hit-secret"
 
 @app.route('/login', methods=['POST']) # type:ignore
-def login():
+def endpoint_login():
     email = request.json.get("email")
     password = request.json.get("password")
 
@@ -34,12 +34,12 @@ def endpoint_is_logged():
 
 
 @app.route('/logout', methods=["GET"]) # type:ignore
-def logout():
+def endpoint_logout():
     session.pop("USER_ID", None)
     return jsonify({'message': 'Logout successful'})
 
 @app.route('/register', methods=['POST']) # type:ignore
-def register():
+def endpoint_register():
     email = request.json.get("email")
     password = request.json.get("password")
 
@@ -55,7 +55,7 @@ def register():
         connection.close()
 
 @app.route('/playlist/create', methods=['POST']) # type:ignore
-def create_playlist():
+def endpoint_create_playlist():
     user_id = session.get("USER_ID")
 
     if not user_id:
@@ -74,7 +74,7 @@ def create_playlist():
         connection.close()
 
 @app.route('/playlist/add-music', methods=['POST']) # type:ignore
-def add_music_to_playlist():
+def endpoint_add_music_to_playlist():
     user_id = session.get("USER_ID")
 
     if not user_id:
