@@ -1,4 +1,4 @@
-from app.infrastructure.database import create_users_table, authenticate_user, register_user
+from app.infrastructure.database import create_users_table, authenticate_user, register_user, create_music_table
 from app.testing import start_sqlite_in_memory_database_connection
 from app.exceptions import EmailAlreadyRegisteredException
 import pytest
@@ -91,3 +91,26 @@ def test_authenticate_user_when_email_exists_and_password_is_correct():
 
     result = authenticate_user(connection, existing_email, existing_password)
     assert result is True
+    
+def test_create_music_table_when_table_does_not_exist():
+    connection = start_sqlite_in_memory_database_connection()
+    
+    create_music_table(connection)
+
+    cursor = connection.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='musics'")
+    result = cursor.fetchone()
+    
+    cursor.close()
+
+    assert result is not None
+
+def test_create_music_table_when_table_already_exists():
+    connection = start_sqlite_in_memory_database_connection()
+    create_music_table(connection)
+
+    try:
+        create_music_table(connection)
+        assert True
+    except Exception:
+        assert False, "should not raise exception when table already exists"

@@ -26,6 +26,23 @@ def create_users_table(connection: sqlite3.Connection):
     cursor.execute(create_statement)
     connection.commit()
 
+def create_music_table(connection: sqlite3.Connection):
+    cursor = connection.cursor()
+
+    create_statement = """
+    CREATE TABLE IF NOT EXISTS
+    musics (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT,
+        artist TEXT,
+        genre TEXT
+    )
+    """
+
+    cursor.execute(create_statement)
+    connection.commit()
+
+
 def register_user(connection: sqlite3.Connection, email: str, password: str):
     cursor = connection.cursor()
 
