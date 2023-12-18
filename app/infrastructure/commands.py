@@ -113,3 +113,18 @@ def register_music_in_playlist(connection: sqlite3.Connection, playlist_id: int,
     cursor.close()
     connection.commit()
 
+def search_music(connection: sqlite3.Connection, search_string: str):
+    cursor = connection.cursor()
+
+    select_music_statement = """
+    SELECT * FROM musics WHERE title LIKE ?
+    ORDER BY title ASC, id ASC
+    LIMIT 10
+    """
+    cursor.execute(select_music_statement, ('%' + search_string + '%',))
+    
+    names = [description[0] for description in cursor.description]
+    results = [dict(zip(names, row)) for row in cursor.fetchall()]
+
+    cursor.close()
+    return results

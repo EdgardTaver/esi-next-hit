@@ -7,7 +7,7 @@ from app.exceptions import (EmailAlreadyRegisteredException,
                             PlaylistAlreadyExistsException,
                             PlaylistNotFoundException)
 from app.infrastructure.commands import (get_authenticated_user_id, register_music_in_playlist,
-                                         register_playlist, register_user)
+                                         register_playlist, register_user, search_music)
 from app.infrastructure.database import (create_music_table,
                                          create_playlist_music_table,
                                          create_playlists_table,
@@ -31,6 +31,7 @@ def test_register_user_when_email_is_new():
     assert result[1] == new_email
 
     cursor.close()
+    connection.close()
 
 def test_register_user_when_email_already_exists():
     connection = start_sqlite_in_memory_database_connection()
@@ -52,6 +53,7 @@ def test_register_user_when_email_already_exists():
     assert result[0] == 1
 
     cursor.close()
+    connection.close()
 
 def test_get_authenticated_user_id_when_email_is_not_registered():
     connection = start_sqlite_in_memory_database_connection()
@@ -66,6 +68,8 @@ def test_get_authenticated_user_id_when_email_is_not_registered():
 
     result = get_authenticated_user_id(connection, non_existing_email, any_password)
     assert result is None
+
+    connection.close()
 
 def test_get_authenticated_user_id_when_email_exists_but_password_is_incorrect():
     connection = start_sqlite_in_memory_database_connection()
@@ -94,6 +98,8 @@ def test_get_authenticated_user_id_when_email_exists_and_password_is_correct():
     result = get_authenticated_user_id(connection, existing_email_user_2, existing_password_user_2)
     assert result == 2
 
+    connection.close()
+
 
 def test_register_playlist_when_playlist_does_not_exist():
     connection = start_sqlite_in_memory_database_connection()
@@ -114,6 +120,7 @@ def test_register_playlist_when_playlist_does_not_exist():
     assert result[2] == user_id
 
     cursor.close()
+    connection.close()
 
 
 def test_register_playlist_when_playlist_already_exists():
@@ -135,6 +142,7 @@ def test_register_playlist_when_playlist_already_exists():
     assert result[0] == 1
 
     cursor.close()
+    connection.close()
 
 
 def test_register_music_in_playlist_when_playlist_not_found():
@@ -148,6 +156,8 @@ def test_register_music_in_playlist_when_playlist_not_found():
 
     with pytest.raises(PlaylistNotFoundException):
         register_music_in_playlist(connection, invalid_playlist_id, existing_music_id)
+    
+    connection.close()
 
 
 def test_register_music_in_playlist_when_music_not_found():
@@ -162,6 +172,8 @@ def test_register_music_in_playlist_when_music_not_found():
 
     with pytest.raises(MusicNotFoundException):
         register_music_in_playlist(connection, existing_playlist_id, invalid_music_id)
+    
+    connection.close()
 
 
 def test_register_music_in_playlist_when_music_not_in_playlist():
@@ -184,6 +196,7 @@ def test_register_music_in_playlist_when_music_not_in_playlist():
     assert result[1] == music_id
 
     cursor.close()
+    connection.close()
 
 
 def test_register_music_in_playlist_when_music_already_in_playlist():
@@ -207,3 +220,32 @@ def test_register_music_in_playlist_when_music_already_in_playlist():
     assert result[0] == 1
 
     cursor.close()
+    connection.close()
+
+def test_search_music_regular_scenario():
+    connection = start_sqlite_in_memory_database_connection()
+    create_music_table(connection)
+
+    register_music(connection, "Stop the music!", "The Dogs", "nu disco", "url/image_1")
+    register_music(connection, "Stop the music!", "Ariana Grande", "new age", "url/image_2")
+    register_music(connection, "Don't Stop the music!", "The Bananas", "death metal", "url/image_3")
+
+    results = search_music(connection, "music")
+
+    assert len(results) == 3
+    assert results[0]["title"] == "Don't Stop the music!"
+    assert results[0]["artist"] == "The Bananas"
+    assert results[0]["genre"] == "death metal"
+    assert results[0]["image_url"] == "url/image_3"
+
+    assert results[1]["title"] == "Stop the music!"
+    assert results[1]["artist"] == "The Dogs"
+    assert results[1]["genre"] == "nu disco"
+    assert results[1]["image_url"] == "url/image_1"
+
+    assert results[2]["title"] == "Stop the music!"
+    assert results[2]["artist"] == "Ariana Grande"
+    assert results[2]["genre"] == "new age"
+    assert results[2]["image_url"] == "url/image_2"
+    
+    # should be ordered by title and id
