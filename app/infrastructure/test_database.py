@@ -1,4 +1,4 @@
-from app.infrastructure.database import create_users_table, authenticate_user, register_user, create_music_table
+from app.infrastructure.database import create_users_table, authenticate_user, register_user, create_music_table, create_playlists_table
 from app.testing import start_sqlite_in_memory_database_connection
 from app.exceptions import EmailAlreadyRegisteredException
 import pytest
@@ -122,6 +122,29 @@ def test_create_music_table_when_table_already_exists():
 
     try:
         create_music_table(connection)
+        assert True
+    except Exception:
+        assert False, "should not raise exception when table already exists"
+
+def test_create_playlists_table_when_table_does_not_exist():
+    connection = start_sqlite_in_memory_database_connection()
+    
+    create_playlists_table(connection)
+
+    cursor = connection.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='playlists'")
+    result = cursor.fetchone()
+    
+    cursor.close()
+
+    assert result is not None
+
+def test_create_playlists_table_when_table_already_exists():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+
+    try:
+        create_playlists_table(connection)
         assert True
     except Exception:
         assert False, "should not raise exception when table already exists"
