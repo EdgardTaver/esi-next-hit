@@ -4,9 +4,20 @@
 
 ## python -m streamlit run app.py
 
+"""
+TODOs:
+
+- [ ] Find a new package for this
+- [ ] Derive configs from app.config file
+"""
+
+from typing import Any, List
 import streamlit as st
 from streamlit_option_menu import option_menu
 from streamlit_searchbox import st_searchbox
+import requests
+
+MUSIC_SEARCH_ENDPOINT = "http://127.0.0.1:5000/music/search"
 
 st.set_page_config(page_title="NextHit", page_icon=":musical_note:", layout="centered")
 
@@ -21,8 +32,30 @@ selected = option_menu(
     orientation="horizontal",
 )
 
+def do_search(search_param: str) -> List[Any]:
+    params = {"q": search_param}
+    response = requests.get(MUSIC_SEARCH_ENDPOINT, params=params)
+
+    if response.status_code != 200:
+        return []
+
+    return response.json()
+
 if selected=="Descobrir":
-    st_searchbox(search_function="List", placeholder="Procure por uma música")
+    title = st.text_input("Procure por uma música...", "")
+    if title:
+        results = do_search(title)
+        if len(results) == 0:
+            st.error("Nenhuma música encontrada")
+        
+        else:
+            for music in results:
+                col1, col2 = st.columns((1,2.75))
+                col1.image(music["image_url"], width=150)
+                col2.subheader(music["title"])
+                col2.write(music["artist"])
+                col2.write(f"Gênero: {music['genre']}")
+
     st.subheader("Descoberta diária")
     st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Playlist Diária", "Descubra: MPB", "Descubra: Rock"], width=150)
     st.subheader("Músicas recomendadas")
