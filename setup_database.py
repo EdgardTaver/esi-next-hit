@@ -10,7 +10,18 @@ if __name__ == "__main__":
     create_playlists_table(connection)
     create_playlist_music_table(connection)
 
-    musics_df = pd.read_csv(MUSICS_CSV_FILE)
-    musics_df.to_sql("musics", connection, if_exists="append", index=False)
+    cursor = connection.cursor()
 
+    select_musics = """
+    SELECT COUNT(*) FROM musics
+    """
+
+    cursor.execute(select_musics)
+    musics_count = cursor.fetchone()[0]
+
+    if musics_count == 0:
+        musics_df = pd.read_csv(MUSICS_CSV_FILE)
+        musics_df.to_sql("musics", connection, if_exists="append", index=False)
+
+    cursor.close()
     connection.close()

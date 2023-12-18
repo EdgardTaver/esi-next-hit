@@ -83,6 +83,7 @@ def create_playlist_music_table(connection: sqlite3.Connection):
     create_statement = """
     CREATE TABLE IF NOT EXISTS
     playlist_music (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         playlist_id INTEGER,
         music_id INTEGER,
         FOREIGN KEY (playlist_id) REFERENCES playlists (id),
