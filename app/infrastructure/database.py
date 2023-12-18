@@ -45,6 +45,23 @@ def create_music_table(connection: sqlite3.Connection):
     cursor.execute(create_statement)
     connection.commit()
 
+def register_music(connection: sqlite3.Connection, title: str, artist: str, genre: str, image_url: str) -> int:
+    # TODO: add testing
+    cursor = connection.cursor()
+
+    insert_statement = """
+    INSERT INTO musics (title, artist, genre, image_url)
+    VALUES (?, ?, ?, ?)
+    """
+
+    cursor.execute(insert_statement, (title, artist, genre, image_url))
+    connection.commit()
+    
+    inserted_music_id = cursor.lastrowid
+    cursor.close()
+
+    return inserted_music_id
+
 
 def create_playlists_table(connection: sqlite3.Connection):
     cursor = connection.cursor()
@@ -62,7 +79,7 @@ def create_playlists_table(connection: sqlite3.Connection):
     cursor.execute(create_statement)
     connection.commit()
 
-def register_playlist(connection: sqlite3.Connection, name: str, user_id: int):
+def register_playlist(connection: sqlite3.Connection, name: str, user_id: int) -> int:
     cursor = connection.cursor()
 
     select_statement = """
@@ -81,6 +98,11 @@ def register_playlist(connection: sqlite3.Connection, name: str, user_id: int):
 
     cursor.execute(insert_statement, (name, user_id))
     connection.commit()
+    
+    inserted_playlist_id = cursor.lastrowid
+    cursor.close()
+
+    return inserted_playlist_id
 
 def register_music_in_playlist(connection: sqlite3.Connection, playlist_id: int, music_id: int):
     cursor = connection.cursor()

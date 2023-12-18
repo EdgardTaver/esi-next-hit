@@ -1,10 +1,18 @@
 import pytest
 
-from app.exceptions import EmailAlreadyRegisteredException, MusicAlreadyInPlaylistException, PlaylistAlreadyExistsException
-from app.infrastructure.database import (get_authenticated_user_id, create_music_table,
+from app.exceptions import (EmailAlreadyRegisteredException,
+                            MusicAlreadyInPlaylistException,
+                            MusicNotFoundException,
+                            PlaylistAlreadyExistsException,
+                            PlaylistNotFoundException)
+from app.infrastructure.database import (create_music_table,
                                          create_playlist_music_table,
                                          create_playlists_table,
-                                         create_users_table, register_music_in_playlist, register_user, register_playlist)
+                                         create_users_table,
+                                         get_authenticated_user_id,
+                                         register_music,
+                                         register_music_in_playlist,
+                                         register_playlist, register_user)
 from app.testing import start_sqlite_in_memory_database_connection
 
 
@@ -222,6 +230,32 @@ def test_register_playlist_when_playlist_already_exists():
 
     cursor.close()
 
+def test_register_music_in_playlist_when_playlist_not_found():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_music_table(connection)
+    create_playlist_music_table(connection)
+
+    invalid_playlist_id = 1
+    existing_music_id = register_music(connection, "music 1", "artist 1", "genre 1", "any.url")
+
+    with pytest.raises(PlaylistNotFoundException):
+        register_music_in_playlist(connection, invalid_playlist_id, existing_music_id)
+
+
+def test_register_music_in_playlist_when_music_not_found():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_music_table(connection)
+    create_playlist_music_table(connection)
+
+    existing_playlist_id = register_playlist(connection, "My Playlist", 1)
+    existing_music_id = register_music(connection, "music 1", "artist 1", "genre 1", "any.url")
+    invalid_music_id = existing_music_id + 1
+
+    with pytest.raises(MusicNotFoundException):
+        register_music_in_playlist(connection, existing_playlist_id, invalid_music_id)
+
 
 def test_register_music_in_playlist_when_music_not_in_playlist():
     connection = start_sqlite_in_memory_database_connection()
@@ -229,8 +263,8 @@ def test_register_music_in_playlist_when_music_not_in_playlist():
     create_music_table(connection)
     create_playlist_music_table(connection)
 
-    playlist_id = 1
-    music_id = 1
+    playlist_id = register_playlist(connection, "My Playlist", 1)
+    music_id = register_music(connection, "music 1", "artist 1", "genre 1", "any.url")
 
     register_music_in_playlist(connection, playlist_id, music_id)
 
@@ -251,8 +285,8 @@ def test_register_music_in_playlist_when_music_already_in_playlist():
     create_music_table(connection)
     create_playlist_music_table(connection)
 
-    playlist_id = 1
-    music_id = 1
+    playlist_id = register_playlist(connection, "My Playlist", 1)
+    music_id = register_music(connection, "music 1", "artist 1", "genre 1", "any.url")
 
     register_music_in_playlist(connection, playlist_id, music_id)
 
