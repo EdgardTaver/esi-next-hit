@@ -301,3 +301,26 @@ def test_register_music_in_playlist_when_music_already_in_playlist():
     assert result[0] == 1
 
     cursor.close()
+
+
+def test_register_music_regular_scenario():
+    connection = start_sqlite_in_memory_database_connection()
+    create_music_table(connection)
+    
+    title = "Test Music"
+    artist = "Test Artist"
+    genre = "Test Genre"
+    image_url = "http://example.com/test.jpg"
+    inserted_music_id = register_music(connection, title, artist, genre, image_url)
+
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM musics WHERE id=?", (inserted_music_id,))
+    result = cursor.fetchone()
+
+    assert result is not None
+    assert result[1] == title
+    assert result[2] == artist
+    assert result[3] == genre
+    assert result[4] == image_url
+
+    cursor.close()

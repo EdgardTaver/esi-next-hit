@@ -32,18 +32,19 @@ def register():
     except EmailAlreadyRegisteredException:
         return jsonify({'message': 'Email already registered'}), 400
 
+@app.route('/playlist', methods=['POST']) # type:ignore
+def create_playlist():
+    user_id = session.get('user_id')
 
-@app.route('/protected', methods=['GET']) # type:ignore
-def protected():
-    if not getattr(g, 'logged_in', False):
-        return jsonify({'message': 'Unauthorized'}), 401
+    
+    if user_id:
+        # Logic to create a new playlist for the logged in user
+        return jsonify({'message': 'Playlist created successfully'})
+    else:
+        return jsonify({'message': 'User not logged in'}), 401
 
-    return jsonify({'message': 'Protected endpoint'})
+
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        connection = start_users_database_connection()
-        create_users_table(connection)
-
     app.run()
