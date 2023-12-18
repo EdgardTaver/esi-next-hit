@@ -21,15 +21,20 @@ from app.frontend.bff import (do_create_playlist, do_list_playlists, do_login,
 SESSION_USER_ID = "user_id"
 SESSION_SHOULD_DISPLAY_LOGIN = "should_display_login_success"
 SESSION_SHOULD_DISPLAY_LOGOUT = "should_display_logout_message"
+SESSION_SHOULD_EXPLORE_PLAYLIST = "should_explore_playlist"
 
 if SESSION_USER_ID not in st.session_state:
-    st.session_state[SESSION_USER_ID] = None
+    st.session_state[SESSION_USER_ID] = 5
+    # TODO: TEMP!!!
 
 if SESSION_SHOULD_DISPLAY_LOGIN not in st.session_state:
     st.session_state[SESSION_SHOULD_DISPLAY_LOGIN] = False
 
 if SESSION_SHOULD_DISPLAY_LOGOUT not in st.session_state:
     st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT] = False
+
+if SESSION_SHOULD_EXPLORE_PLAYLIST not in st.session_state:
+    st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] = None
 
 st.set_page_config(page_title="NextHit", page_icon=":musical_note:", layout="centered")
 
@@ -75,6 +80,13 @@ if selected=="Playlists":
     if st.session_state[SESSION_USER_ID] is None:
         st.error("Faça login para criar uma playlist")
 
+    elif st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] is not None:
+        if st.button(key="playlist_exploring_go_back", label="Voltar"):
+            st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] = None
+            st.rerun()
+
+        st.header(f"Explorando playlist {st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST]}")
+
     else:
         with st.form(key="create_playlist_form"):
             st.subheader("Crie uma playlist")
@@ -98,11 +110,17 @@ if selected=="Playlists":
                 col1, col2 = st.columns((1,2.75))
                 col1.image("playlist.jpg", width=150)
                 col2.subheader(playlist["name"])
-                col2.button(key=playlist["id"], label="Explorar")
+
+                unique_button_key = f"explore_{playlist['id']}"
+                if col2.button(key=unique_button_key, label="Explorar"):
+                    st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] = playlist["id"]
+                    st.rerun()
                 
                 # st.write(f"Total de músicas: {playlist['total_musics']}")
                 # st.write(f"Total de minutos: {playlist['total_minutes']}")
                 # st.write(f"Total de horas: {playlist['total_hours']}")
+
+
 
     # st.subheader("Playlists dos seus gêneros favoritos")
     # st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Pop", "Eletrônica", "Rock", "Jazz"], width=150)
