@@ -1,4 +1,5 @@
 import sqlite3
+from typing import Optional
 
 from app.infrastructure.password import encrypt_password
 from app.config import USERS_DATABASE_FILE
@@ -99,14 +100,15 @@ def register_user(connection: sqlite3.Connection, email: str, password: str):
     cursor.execute(insert_statement, (email, encrypted_password))
     connection.commit()
 
-def authenticate_user(connection: sqlite3.Connection, email: str, password: str):
+def authenticate_user(connection: sqlite3.Connection, email: str, password: str) -> Optional[int]:
     cursor = connection.cursor()
 
-    cursor.execute("SELECT password FROM users WHERE email=?", (email,))
+    cursor.execute("SELECT id, password FROM users WHERE email=?", (email,))
     result = cursor.fetchone()
 
     if result is not None:
-        stored_password = result[0]
-        return encrypt_password(password) == stored_password
+        user_id, stored_password = result
+        if encrypt_password(password) == stored_password:
+            return user_id
 
-    return False
+    return None

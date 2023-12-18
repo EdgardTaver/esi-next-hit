@@ -100,12 +100,16 @@ def test_authenticate_user_when_email_exists_and_password_is_correct():
     connection = start_sqlite_in_memory_database_connection()
     create_users_table(connection)
 
-    existing_email = "test@example.com"
-    existing_password = "password123"
-    register_user(connection, existing_email, existing_password)
+    existing_email_user_1 = "test@example.com"
+    existing_password_user_1 = "password123"
+    register_user(connection, existing_email_user_1, existing_password_user_1)
 
-    result = authenticate_user(connection, existing_email, existing_password)
-    assert result is True
+    existing_email_user_2 = "test_222@example.com"
+    existing_password_user_2 = "password456"
+    register_user(connection, existing_email_user_2, existing_password_user_2)
+
+    result = authenticate_user(connection, existing_email_user_2, existing_password_user_2)
+    assert result == 2
     
 def test_create_music_table_when_table_does_not_exist():
     connection = start_sqlite_in_memory_database_connection()
