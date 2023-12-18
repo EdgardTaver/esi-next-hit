@@ -72,14 +72,14 @@ def do_login(email: str, password: str) -> Optional[int]:
     
     return response.json()["user_id"]
 
-def do_register(email: str, password: str) -> bool:
+def do_register(email: str, password: str) -> Optional[int]:
     payload = {"email": email, "password": password}
     response = requests.post(REGISTER_ENDPOINT, json=payload)
     
     if response.status_code != 200:
-        return False
+        return None
     
-    return True
+    return response.json()["user_id"]
 
 def do_logout() -> bool:
     response = requests.get(LOGOUT_ENDPOINT)
@@ -160,20 +160,20 @@ if selected=="Perfil":
                     st.session_state["user_id"] = login_response
                     st.session_state["should_display_login_success"] = True
         
-        # with st.form(key="register_form"):
-        #     st.subheader("Não possui uma conta? Cadastre-se!")
+        with st.form(key="register_form"):
+            st.subheader("Não possui uma conta? Cadastre-se!")
 
-        #     email = st.text_input("Email")
-        #     password = st.text_input("Password", type="password")
+            email = st.text_input("Email")
+            password = st.text_input("Password", type="password")
 
-        #     submitted = st.form_submit_button("Cadastrar")
-        #     if submitted:
-        #         register_response = do_register(email, password)
-        #         if not register_response:
-        #             st.error("E-mail já cadastrado.")
-        #         else:
-        #             st.session_state["is_logged"] = True
-        #             st.session_state["should_display_login_success"] = True
+            submitted = st.form_submit_button("Cadastrar")
+            if submitted:
+                register_response = do_register(email, password)
+                if not register_response:
+                    st.error("E-mail já cadastrado.")
+                else:
+                    st.session_state["user_id"] = register_response
+                    st.session_state["should_display_login_success"] = True
 
     # st.subheader("Nome do Perfil")
     # st.image("axolote.jpg", width=100)
