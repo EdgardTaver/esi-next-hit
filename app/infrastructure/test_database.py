@@ -1,10 +1,10 @@
 import pytest
 
-from app.exceptions import EmailAlreadyRegisteredException
+from app.exceptions import EmailAlreadyRegisteredException, PlaylistAlreadyExistsException
 from app.infrastructure.database import (get_authenticated_user_id, create_music_table,
                                          create_playlist_music_table,
                                          create_playlists_table,
-                                         create_users_table, register_user)
+                                         create_users_table, register_user, register_playlist)
 from app.testing import start_sqlite_in_memory_database_connection
 
 
@@ -180,3 +180,44 @@ def test_create_playlist_music_table_when_table_already_exists():
         assert True
     except Exception:
         assert False, "should not raise exception when table already exists"
+
+
+def test_register_playlist_when_playlist_does_not_exist():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_users_table(connection)
+
+    user_id = 1
+    playlist_name = "My Playlist"
+    register_playlist(connection, playlist_name, user_id)
+
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM playlists WHERE name=?", (playlist_name,))
+    result = cursor.fetchone()
+
+    assert result is not None
+    assert result[1] == playlist_name
+    assert result[2] == user_id
+
+    cursor.close()
+
+
+def test_register_playlist_when_playlist_already_exists():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_users_table(connection)
+
+    user_id = 1
+    playlist_name = "My Playlist"
+    register_playlist(connection, playlist_name, user_id)
+
+    with pytest.raises(PlaylistAlreadyExistsException):
+        register_playlist(connection, playlist_name, user_id)
+
+    cursor = connection.cursor()
+    cursor.execute("SELECT COUNT(*) FROM playlists WHERE name=? AND user_id=?", (playlist_name, user_id))
+    result = cursor.fetchone()
+
+    assert result[0] == 1
+
+    cursor.close()
