@@ -2,7 +2,7 @@
   - [ ] ...
 
 - [ ] Backend:
-  - [ ] Login.
+  - [X] Login.
   - [ ] Criação de playlists.
   - [ ] Músicas semelhantes.
   - [ ] Playlists automáticas.
