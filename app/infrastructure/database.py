@@ -1,9 +1,10 @@
 import sqlite3
 from typing import Optional
 
-from app.infrastructure.password import encrypt_password
 from app.config import DATABASE_FILE
-from app.exceptions import EmailAlreadyRegisteredException
+from app.exceptions import (EmailAlreadyRegisteredException, MusicAlreadyInPlaylistException,
+                            PlaylistAlreadyExistsException)
+from app.infrastructure.password import encrypt_password
 
 
 def start_users_database_connection() -> sqlite3.Connection:
@@ -79,6 +80,26 @@ def register_playlist(connection: sqlite3.Connection, name: str, user_id: int):
     """
 
     cursor.execute(insert_statement, (name, user_id))
+    connection.commit()
+
+def register_music_in_playlist(connection: sqlite3.Connection, playlist_id: int, music_id: int):
+    cursor = connection.cursor()
+
+    select_statement = """
+    SELECT playlist_id, music_id FROM playlist_music WHERE playlist_id=? AND music_id=?
+    """
+    cursor.execute(select_statement, (playlist_id, music_id))
+    existing_music = cursor.fetchone()
+
+    if existing_music:
+        raise MusicAlreadyInPlaylistException("Music already in playlist")
+
+    insert_statement = """
+    INSERT INTO playlist_music (playlist_id, music_id)
+    VALUES (?, ?)
+    """
+
+    cursor.execute(insert_statement, (playlist_id, music_id))
     connection.commit()
 
 

@@ -3,3 +3,6 @@ class EmailAlreadyRegisteredException(Exception):
 
 class PlaylistAlreadyExistsException(Exception):
     pass
+
+class MusicAlreadyInPlaylistException(Exception):
+    pass

@@ -1,10 +1,10 @@
 import pytest
 
-from app.exceptions import EmailAlreadyRegisteredException, PlaylistAlreadyExistsException
+from app.exceptions import EmailAlreadyRegisteredException, MusicAlreadyInPlaylistException, PlaylistAlreadyExistsException
 from app.infrastructure.database import (get_authenticated_user_id, create_music_table,
                                          create_playlist_music_table,
                                          create_playlists_table,
-                                         create_users_table, register_user, register_playlist)
+                                         create_users_table, register_music_in_playlist, register_user, register_playlist)
 from app.testing import start_sqlite_in_memory_database_connection
 
 
@@ -216,6 +216,51 @@ def test_register_playlist_when_playlist_already_exists():
 
     cursor = connection.cursor()
     cursor.execute("SELECT COUNT(*) FROM playlists WHERE name=? AND user_id=?", (playlist_name, user_id))
+    result = cursor.fetchone()
+
+    assert result[0] == 1
+
+    cursor.close()
+
+
+def test_register_music_in_playlist_when_music_not_in_playlist():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_music_table(connection)
+    create_playlist_music_table(connection)
+
+    playlist_id = 1
+    music_id = 1
+
+    register_music_in_playlist(connection, playlist_id, music_id)
+
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM playlist_music WHERE playlist_id=? AND music_id=?", (playlist_id, music_id))
+    result = cursor.fetchone()
+
+    assert result is not None
+    assert result[0] == playlist_id
+    assert result[1] == music_id
+
+    cursor.close()
+
+
+def test_register_music_in_playlist_when_music_already_in_playlist():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_music_table(connection)
+    create_playlist_music_table(connection)
+
+    playlist_id = 1
+    music_id = 1
+
+    register_music_in_playlist(connection, playlist_id, music_id)
+
+    with pytest.raises(MusicAlreadyInPlaylistException):
+        register_music_in_playlist(connection, playlist_id, music_id)
+
+    cursor = connection.cursor()
+    cursor.execute("SELECT COUNT(*) FROM playlist_music WHERE playlist_id=? AND music_id=?", (playlist_id, music_id))
     result = cursor.fetchone()
 
     assert result[0] == 1
