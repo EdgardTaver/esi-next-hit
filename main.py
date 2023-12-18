@@ -30,7 +30,7 @@ def endpoint_login():
         return jsonify({'message': 'Invalid email or password'}), 401
 
 
-@app.route("/user/is_logged", methods=["GET"]) # type:ignore
+@app.route("/user/is-logged", methods=["GET"]) # type:ignore
 def endpoint_is_logged():
     user_id = session.get("USER_ID")
     if user_id:

@@ -18,6 +18,23 @@ from streamlit_searchbox import st_searchbox
 import requests
 
 MUSIC_SEARCH_ENDPOINT = "http://127.0.0.1:5000/music/search"
+LOGIN_ENDPOINT = "http://127.0.0.1:5000/user/login"
+CHECK_LOGIN_ENDPOINT = "http://127.0.0.1:5000/user/is-logged"
+
+def do_check_login():
+    response = requests.get(CHECK_LOGIN_ENDPOINT)
+    if response.status_code == 200:
+        response_json = response.json()
+        if response_json["is_logged"] == True:
+            return True
+    
+    return False
+
+if "is_logged" not in st.session_state:
+    st.session_state["is_logged"] = do_check_login()
+
+if "should_display_login_success" not in st.session_state:
+    st.session_state["should_display_login_success"] = False
 
 st.set_page_config(page_title="NextHit", page_icon=":musical_note:", layout="centered")
 
@@ -40,6 +57,16 @@ def do_search(search_param: str) -> List[Any]:
         return []
 
     return response.json()
+
+def do_login(email: str, password: str) -> bool:
+    payload = {"email": email, "password": password}
+    response = requests.post(LOGIN_ENDPOINT, json=payload)
+    
+    if response.status_code != 200:
+        return False
+    
+    return True
+
 
 if selected=="Descobrir":
     title = st.text_input("Procure por uma música...", "")
@@ -74,19 +101,46 @@ if selected=="Playlists":
     st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Mix melhores", "Chiclete", "Relaxando", "Focado"], width=150)
 
 if selected=="Perfil":
-    st.subheader("Nome do Perfil")
-    st.image("axolote.jpg", width=100)
-    left_column, right_column = st.columns(2)
-    with left_column:
-        st.subheader("Minhas playlists")
-    with right_column:
-        st.button(label="criar playlist")
-    st.image("playlist.jpg", caption="Minhas favoritas", width=150)
-    st.subheader("Estatísticas")
-    st.write(
-        """
-        Playlists criadas: 1\n
-        Músicas curtidas: 20\n
-        Gênero favorito: Pop
-        """
-    )
+    # TODO: find out a way to control a sort of login state
+
+    st.subheader("Login")
+    
+    if st.session_state["is_logged"]:
+        if st.session_state["should_display_login_success"]:
+            st.success("Login realizado com sucesso!")
+            st.session_state["should_display_login_success"] = False
+        
+        st.write("Olá!")
+        # TODO: add more info
+        st.button(key="logout", label="Logout")
+    
+    else:
+        with st.form(key="login_form"):
+            email = st.text_input("Email")
+            password = st.text_input("Password", type="password")
+
+            submitted = st.form_submit_button("Login")
+            if submitted:
+                login_response = do_login(email, password)
+                if not login_response:
+                    st.error("E-mail ou senha inválidos.")
+                else:
+                    st.session_state["is_logged"] = True
+                    st.session_state["should_display_login_success"] = True
+
+    # st.subheader("Nome do Perfil")
+    # st.image("axolote.jpg", width=100)
+    # left_column, right_column = st.columns(2)
+    # with left_column:
+    #     st.subheader("Minhas playlists")
+    # with right_column:
+    #     st.button(label="criar playlist")
+    # st.image("playlist.jpg", caption="Minhas favoritas", width=150)
+    # st.subheader("Estatísticas")
+    # st.write(
+    #     """
+    #     Playlists criadas: 1\n
+    #     Músicas curtidas: 20\n
+    #     Gênero favorito: Pop
+    #     """
+    # )
