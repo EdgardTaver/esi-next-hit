@@ -197,7 +197,8 @@ def test_register_playlist_when_playlist_does_not_exist():
 
     user_id = 1
     playlist_name = "My Playlist"
-    register_playlist(connection, playlist_name, user_id)
+    exercise = register_playlist(connection, playlist_name, user_id)
+    assert exercise == 1
 
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM playlists WHERE name=?", (playlist_name,))
