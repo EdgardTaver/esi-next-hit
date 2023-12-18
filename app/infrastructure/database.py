@@ -2,13 +2,13 @@ import sqlite3
 from typing import Optional
 
 from app.infrastructure.password import encrypt_password
-from app.config import USERS_DATABASE_FILE
+from app.config import DATABASE_FILE
 from app.exceptions import EmailAlreadyRegisteredException
 
 
 def start_users_database_connection() -> sqlite3.Connection:
     # TODO: integration test?
-    conn = sqlite3.connect(USERS_DATABASE_FILE)
+    conn = sqlite3.connect(DATABASE_FILE)
     return conn
 
 
