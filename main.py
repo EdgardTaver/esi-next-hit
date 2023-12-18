@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, g
 
-from app.infrastructure.database import create_users_table, register_user, authenticate_user, start_users_database_connection
+from app.infrastructure.database import create_users_table, register_user, get_authenticated_user_id, start_users_database_connection
 from app.exceptions import EmailAlreadyRegisteredException
 from flask import session
 
@@ -12,7 +12,7 @@ def login():
     password = request.json.get("password")
 
     connection = start_users_database_connection()
-    user_id = authenticate_user(connection, email, password)
+    user_id = get_authenticated_user_id(connection, email, password)
     if user_id:
         session['user_id'] = user_id
         return jsonify({'message': 'Login successful', 'user_id': user_id})

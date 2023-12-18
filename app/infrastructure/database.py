@@ -101,7 +101,7 @@ def register_user(connection: sqlite3.Connection, email: str, password: str):
     cursor.execute(insert_statement, (email, encrypted_password))
     connection.commit()
 
-def authenticate_user(connection: sqlite3.Connection, email: str, password: str) -> Optional[int]:
+def get_authenticated_user_id(connection: sqlite3.Connection, email: str, password: str) -> Optional[int]:
     cursor = connection.cursor()
 
     cursor.execute("SELECT id, password FROM users WHERE email=?", (email,))
