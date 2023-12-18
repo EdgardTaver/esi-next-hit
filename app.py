@@ -17,8 +17,15 @@ from streamlit_option_menu import option_menu
 from app.frontend.bff import (do_create_playlist, do_list_playlists, do_login,
                               do_logout, do_register, do_search,
                               do_show_playlist)
-from app.frontend.components import list_musics
-from app.frontend.session import SESSION_CLEAR_SEARCH_RESULTS, SESSION_PLAYLIST_BEING_EXPLORED, SESSION_SHOULD_DISPLAY_LOGIN, SESSION_SHOULD_DISPLAY_LOGOUT, SESSION_SHOULD_DISPLAY_MUSIC_ADDED, SESSION_SHOULD_EXPLORE_PLAYLIST, SESSION_USER_ID, initialize_session_variables
+from app.frontend.components import add_to_playlist_button, list_musics
+from app.frontend.session import (SESSION_CLEAR_SEARCH_RESULTS,
+                                  SESSION_PLAYLIST_BEING_EXPLORED,
+                                  SESSION_SHOULD_DISPLAY_LOGIN,
+                                  SESSION_SHOULD_DISPLAY_LOGOUT,
+                                  SESSION_SHOULD_DISPLAY_MUSIC_ADDED,
+                                  SESSION_SHOULD_EXPLORE_PLAYLIST,
+                                  SESSION_USER_ID,
+                                  initialize_session_variables)
 
 initialize_session_variables()
 
@@ -43,7 +50,7 @@ if selected=="Descobrir":
             st.error("Nenhuma música encontrada")
         
         else:
-            list_musics(results, False)
+            list_musics(results)
 
     st.subheader("Descoberta diária")
     st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Playlist Diária", "Descubra: MPB", "Descubra: Rock"], width=150)
@@ -74,7 +81,7 @@ if selected=="Playlists":
         if len(musics) == 0:
             st.warning("Playlist vazia")
         else:
-            list_musics(musics, False)
+            list_musics(musics)
 
         st.subheader("Adicionar músicas à playlist")
         title = st.text_input("Procure por uma música...", "")
@@ -84,7 +91,7 @@ if selected=="Playlists":
                 st.error("Nenhuma música encontrada")
             
             else:
-                list_musics(results, True)
+                list_musics(results, add_to_playlist_button)
 
         st.session_state[SESSION_CLEAR_SEARCH_RESULTS] = False
 
