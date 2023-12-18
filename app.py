@@ -55,6 +55,7 @@ if selected=="Descobrir":
                 col2.subheader(music["title"])
                 col2.write(music["artist"])
                 col2.write(f"Gênero: {music['genre']}")
+                col2.button(key=music["id"], label="Adicionar à playlist")
 
     st.subheader("Descoberta diária")
     st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Playlist Diária", "Descubra: MPB", "Descubra: Rock"], width=150)
