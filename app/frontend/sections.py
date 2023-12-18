@@ -42,7 +42,7 @@ def explore_playlist_section():
 
     st.subheader("Adicionar músicas à playlist")
     
-    music_search_box(add_to_playlist_button)
+    music_search_box("playlist_search_bar", add_to_playlist_button)
 
     st.session_state[SESSION_CLEAR_SEARCH_RESULTS] = False
 

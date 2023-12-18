@@ -1,3 +1,4 @@
+import random
 from typing import Any, Callable, Dict, List
 
 import streamlit as st
@@ -35,8 +36,8 @@ def list_musics(musics: List[Dict[str, Any]], interaction_button: Callable[[Any,
 
         interaction_button(col2, music["id"])
 
-def music_search_box(interaction_button: Callable[[Any, int], None] = no_op_button):
-    music_search_term = st.text_input("Procure por uma música...", "")
+def music_search_box(unique_key: str, interaction_button: Callable[[Any, int], None] = no_op_button):
+    music_search_term = st.text_input(key=unique_key, label="Procure por uma música...")
     if music_search_term and not st.session_state[SESSION_CLEAR_SEARCH_RESULTS]:
         results = do_search(music_search_term)
         if len(results) == 0:
