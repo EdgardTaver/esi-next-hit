@@ -11,6 +11,6 @@ if __name__ == "__main__":
     create_playlist_music_table(connection)
 
     musics_df = pd.read_csv(MUSICS_CSV_FILE)
-    musics_df.to_sql("musics", connection, if_exists="replace", index=False)
+    musics_df.to_sql("musics", connection, if_exists="append", index=False)
 
     connection.close()
