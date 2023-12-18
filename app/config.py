@@ -1,1 +1,1 @@
-USERS_DATABASE_FILE = "users.db"
+USERS_DATABASE_FILE = "data/users.db"
