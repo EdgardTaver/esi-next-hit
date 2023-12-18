@@ -8,7 +8,7 @@ from app.exceptions import (EmailAlreadyRegisteredException,
 from app.infrastructure.commands import (get_authenticated_user_id,
                                          register_music_in_playlist,
                                          register_playlist, register_user,
-                                         search_music)
+                                         search_music, list_playlists_for_user)
 from app.infrastructure.database import start_users_database_connection
 
 app = Flask(__name__)
@@ -69,10 +69,10 @@ def endpoint_create_playlist():
     connection = start_users_database_connection()
     try:
         user_id = request.json.get("user_id")
-        playlist_name = request.json.get("playlist_name")
-
         if not user_id:
             return jsonify({'message': 'Missing user_id'}), 400
+        
+        playlist_name = request.json.get("playlist_name")
         if not playlist_name:
             return jsonify({'message': 'Missing playlist_name'}), 400
         # TODO: test this
@@ -82,6 +82,23 @@ def endpoint_create_playlist():
     
     except PlaylistAlreadyExistsException:
         return jsonify({'message': 'Playlist already exists'}), 400
+
+    finally:
+        connection.close()
+
+@app.route("/playlist/list", methods=['POST']) # type:ignore
+def endpoint_list_playlists():
+    connection = start_users_database_connection()
+    try:
+        user_id = request.json.get("user_id")
+        if not user_id:
+            return jsonify({'message': 'Missing user_id'}), 400
+
+        playlists = list_playlists_for_user(connection, user_id)
+        return jsonify(playlists)
+    
+    except Exception:
+        return jsonify({'message': 'Unexpected issue'}), 500
 
     finally:
         connection.close()

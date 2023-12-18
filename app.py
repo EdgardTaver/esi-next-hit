@@ -15,7 +15,8 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 from streamlit_searchbox import st_searchbox
 
-from app.frontend.bff import do_create_playlist, do_login, do_logout, do_register, do_search
+from app.frontend.bff import (do_create_playlist, do_list_playlists, do_login,
+                              do_logout, do_register, do_search)
 
 SESSION_USER_ID = "user_id"
 SESSION_SHOULD_DISPLAY_LOGIN = "should_display_login_success"
@@ -85,11 +86,27 @@ if selected=="Playlists":
                     st.error("Erro ao criar playlist.")
                 else:
                     st.success("Playlist criada com sucesso!")
+        
 
-    st.subheader("Playlists dos seus gêneros favoritos")
-    st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Pop", "Eletrônica", "Rock", "Jazz"], width=150)
-    st.subheader("Playlists salvas")
-    st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Mix melhores", "Chiclete", "Relaxando", "Focado"], width=150)
+        st.subheader("Playlists salvas")
+        playlists = do_list_playlists(st.session_state[SESSION_USER_ID])
+        if len(playlists) == 0:
+            st.warning("Nenhuma playlist encontrada")
+        
+        else:
+            for playlist in playlists:
+                col1, col2 = st.columns((1,2.75))
+                col1.image("playlist.jpg", width=150)
+                col2.subheader(playlist["name"])
+                col2.button(key=playlist["id"], label="Explorar")
+                
+                # st.write(f"Total de músicas: {playlist['total_musics']}")
+                # st.write(f"Total de minutos: {playlist['total_minutes']}")
+                # st.write(f"Total de horas: {playlist['total_hours']}")
+
+    # st.subheader("Playlists dos seus gêneros favoritos")
+    # st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Pop", "Eletrônica", "Rock", "Jazz"], width=150)
+    
 
 if selected=="Perfil":
     if st.session_state[SESSION_SHOULD_DISPLAY_LOGIN]:
