@@ -23,7 +23,17 @@ def login():
     else:
         return jsonify({'message': 'Invalid email or password'}), 401
 
-@app.route('/logout', methods=['POST']) # type:ignore
+
+@app.route("/is_logged", methods=["GET"]) # type:ignore
+def endpoint_is_logged():
+    user_id = session.get("USER_ID")
+    if user_id:
+        return jsonify({'is_logged': True})
+    else:
+        return jsonify({'is_logged': False})
+
+
+@app.route('/logout', methods=["GET"]) # type:ignore
 def logout():
     session.pop("USER_ID", None)
     return jsonify({'message': 'Logout successful'})
