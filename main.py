@@ -1,14 +1,20 @@
-from flask import Flask, jsonify, request, session, g
+from flask import Flask, g, jsonify, request, session
 
-from app.exceptions import EmailAlreadyRegisteredException, MusicAlreadyInPlaylistException, MusicNotFoundException, PlaylistAlreadyExistsException, PlaylistNotFoundException
+from app.exceptions import (EmailAlreadyRegisteredException,
+                            MusicAlreadyInPlaylistException,
+                            MusicNotFoundException,
+                            PlaylistAlreadyExistsException,
+                            PlaylistNotFoundException)
 from app.infrastructure.commands import (get_authenticated_user_id,
-                                         register_playlist, register_user, register_music_in_playlist, search_music)
+                                         register_music_in_playlist,
+                                         register_playlist, register_user,
+                                         search_music)
 from app.infrastructure.database import start_users_database_connection
 
 app = Flask(__name__)
 app.secret_key = "my-next-hit-secret"
 
-@app.route('/login', methods=['POST']) # type:ignore
+@app.route("/user/login", methods=['POST']) # type:ignore
 def endpoint_login():
     email = request.json.get("email")
     password = request.json.get("password")
@@ -24,7 +30,7 @@ def endpoint_login():
         return jsonify({'message': 'Invalid email or password'}), 401
 
 
-@app.route("/is_logged", methods=["GET"]) # type:ignore
+@app.route("/user/is_logged", methods=["GET"]) # type:ignore
 def endpoint_is_logged():
     user_id = session.get("USER_ID")
     if user_id:
@@ -33,12 +39,12 @@ def endpoint_is_logged():
         return jsonify({'is_logged': False})
 
 
-@app.route('/logout', methods=["GET"]) # type:ignore
+@app.route("/user/logout", methods=["GET"]) # type:ignore
 def endpoint_logout():
     session.pop("USER_ID", None)
     return jsonify({'message': 'Logout successful'})
 
-@app.route('/register', methods=['POST']) # type:ignore
+@app.route("/user/register", methods=['POST']) # type:ignore
 def endpoint_register():
     email = request.json.get("email")
     password = request.json.get("password")
@@ -54,7 +60,7 @@ def endpoint_register():
     finally:
         connection.close()
 
-@app.route('/playlist/create', methods=['POST']) # type:ignore
+@app.route("/playlist/create", methods=['POST']) # type:ignore
 def endpoint_create_playlist():
     user_id = session.get("USER_ID")
 
@@ -73,7 +79,7 @@ def endpoint_create_playlist():
     finally:
         connection.close()
 
-@app.route('/playlist/add-music', methods=['POST']) # type:ignore
+@app.route("/playlist/add-music", methods=['POST']) # type:ignore
 def endpoint_add_music_to_playlist():
     user_id = session.get("USER_ID")
 
@@ -99,7 +105,7 @@ def endpoint_add_music_to_playlist():
     finally:
         connection.close()
 
-@app.route('/music/search', methods=['GET']) # type:ignore
+@app.route("/music/search", methods=['GET']) # type:ignore
 def endpoint_search_music():
     search_term = request.args.get("q")
     if search_term is None:
