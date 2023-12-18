@@ -16,7 +16,7 @@ from streamlit_option_menu import option_menu
 from streamlit_searchbox import st_searchbox
 
 from app.frontend.bff import (do_create_playlist, do_list_playlists, do_login,
-                              do_logout, do_register, do_search)
+                              do_logout, do_register, do_search, do_show_playlist)
 
 SESSION_USER_ID = "user_id"
 SESSION_SHOULD_DISPLAY_LOGIN = "should_display_login_success"
@@ -86,6 +86,19 @@ if selected=="Playlists":
             st.rerun()
 
         st.header(f"Explorando playlist {st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST]}")
+
+        musics = do_show_playlist(st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST])
+        if len(musics) == 0:
+            st.warning("Playlist vazia")
+        
+        else:
+            for music in musics:
+                col1, col2 = st.columns((1,2.75))
+                col1.image(music["image_url"], width=150)
+                col2.subheader(music["title"])
+                col2.write(music["artist"])
+                col2.write(f"Gênero: {music['genre']}")
+                col2.button(key=music["id"], label="Adicionar à playlist")
 
     else:
         with st.form(key="create_playlist_form"):
