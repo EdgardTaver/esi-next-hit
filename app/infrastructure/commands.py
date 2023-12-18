@@ -1,7 +1,36 @@
 import sqlite3
+from typing import Optional
 
-from app.exceptions import MusicAlreadyInPlaylistException, MusicNotFoundException, PlaylistNotFoundException
+from app.exceptions import (MusicAlreadyInPlaylistException,
+                            MusicNotFoundException,
+                            PlaylistAlreadyExistsException,
+                            PlaylistNotFoundException)
 
+
+def register_playlist(connection: sqlite3.Connection, name: str, user_id: int) -> Optional[int]:
+    cursor = connection.cursor()
+
+    select_statement = """
+    SELECT id FROM playlists WHERE name=? AND user_id=?
+    """
+    cursor.execute(select_statement, (name, user_id))
+    existing_playlist = cursor.fetchone()
+
+    if existing_playlist:
+        raise PlaylistAlreadyExistsException("Playlist with the same name already exists for the user")
+
+    insert_statement = """
+    INSERT INTO playlists (name, user_id)
+    VALUES (?, ?)
+    """
+
+    cursor.execute(insert_statement, (name, user_id))
+    connection.commit()
+    
+    inserted_playlist_id = cursor.lastrowid
+    cursor.close()
+
+    return inserted_playlist_id
 
 def register_music_in_playlist(connection: sqlite3.Connection, playlist_id: int, music_id: int):
     cursor = connection.cursor()

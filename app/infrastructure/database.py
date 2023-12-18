@@ -79,31 +79,6 @@ def create_playlists_table(connection: sqlite3.Connection):
     cursor.execute(create_statement)
     connection.commit()
 
-def register_playlist(connection: sqlite3.Connection, name: str, user_id: int) -> int:
-    cursor = connection.cursor()
-
-    select_statement = """
-    SELECT id FROM playlists WHERE name=? AND user_id=?
-    """
-    cursor.execute(select_statement, (name, user_id))
-    existing_playlist = cursor.fetchone()
-
-    if existing_playlist:
-        raise PlaylistAlreadyExistsException("Playlist with the same name already exists for the user")
-
-    insert_statement = """
-    INSERT INTO playlists (name, user_id)
-    VALUES (?, ?)
-    """
-
-    cursor.execute(insert_statement, (name, user_id))
-    connection.commit()
-    
-    inserted_playlist_id = cursor.lastrowid
-    cursor.close()
-
-    return inserted_playlist_id
-
 def create_playlist_music_table(connection: sqlite3.Connection):
     cursor = connection.cursor()
 
