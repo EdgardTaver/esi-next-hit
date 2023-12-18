@@ -29,6 +29,7 @@ def register_user(connection: sqlite3.Connection, email: str, password: str):
 
     encrypted_password = encrypt_password(password)
     cursor.execute(insert_statement, (email, encrypted_password))
+    cursor.close()
     connection.commit()
 
 
@@ -37,6 +38,8 @@ def get_authenticated_user_id(connection: sqlite3.Connection, email: str, passwo
 
     cursor.execute("SELECT id, password FROM users WHERE email=?", (email,))
     result = cursor.fetchone()
+
+    cursor.close()
 
     if result is not None:
         user_id, stored_password = result
@@ -107,4 +110,6 @@ def register_music_in_playlist(connection: sqlite3.Connection, playlist_id: int,
     """
 
     cursor.execute(insert_statement, (playlist_id, music_id))
+    cursor.close()
     connection.commit()
+
