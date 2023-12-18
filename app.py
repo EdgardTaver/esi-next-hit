@@ -13,36 +13,14 @@ TODOs:
 
 import streamlit as st
 from streamlit_option_menu import option_menu
-from streamlit_searchbox import st_searchbox
 
 from app.frontend.bff import (do_create_playlist, do_list_playlists, do_login,
                               do_logout, do_register, do_search,
                               do_show_playlist)
 from app.frontend.components import list_musics
-from app.frontend.session import (SESSION_CLEAR_SEARCH_RESULTS, SESSION_SHOULD_DISPLAY_LOGIN,
-                                  SESSION_SHOULD_DISPLAY_LOGOUT,
-                                  SESSION_SHOULD_DISPLAY_MUSIC_ADDED,
-                                  SESSION_SHOULD_EXPLORE_PLAYLIST,
-                                  SESSION_USER_ID)
+from app.frontend.session import SESSION_CLEAR_SEARCH_RESULTS, SESSION_SHOULD_DISPLAY_LOGIN, SESSION_SHOULD_DISPLAY_LOGOUT, SESSION_SHOULD_DISPLAY_MUSIC_ADDED, SESSION_SHOULD_EXPLORE_PLAYLIST, SESSION_USER_ID, initialize_session_variables
 
-if SESSION_USER_ID not in st.session_state:
-    st.session_state[SESSION_USER_ID] = 5
-    # TODO: TEMP!!!
-
-if SESSION_SHOULD_DISPLAY_LOGIN not in st.session_state:
-    st.session_state[SESSION_SHOULD_DISPLAY_LOGIN] = False
-
-if SESSION_SHOULD_DISPLAY_LOGOUT not in st.session_state:
-    st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT] = False
-
-if SESSION_SHOULD_EXPLORE_PLAYLIST not in st.session_state:
-    st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] = None
-
-if SESSION_SHOULD_DISPLAY_MUSIC_ADDED not in st.session_state:
-    st.session_state[SESSION_SHOULD_DISPLAY_MUSIC_ADDED] = False
-
-if SESSION_CLEAR_SEARCH_RESULTS not in st.session_state:
-    st.session_state[SESSION_CLEAR_SEARCH_RESULTS] = False
+initialize_session_variables()
 
 st.set_page_config(page_title="NextHit", page_icon=":musical_note:", layout="centered")
 
@@ -77,8 +55,6 @@ if selected=="Descobrir":
     st.image(["music.png", "music.png", "music.png", "music.png"], caption=["music 1", "music 2", "music 3", "music 4"], width=150) 
 
 if selected=="Playlists":
-    st_searchbox(search_function="List", placeholder="Procure por um gênero")
-
     if st.session_state[SESSION_USER_ID] is None:
         st.error("Faça login para criar uma playlist")
 
