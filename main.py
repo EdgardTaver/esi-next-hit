@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request, session, g
 
 from app.exceptions import EmailAlreadyRegisteredException, MusicAlreadyInPlaylistException, MusicNotFoundException, PlaylistAlreadyExistsException, PlaylistNotFoundException
 from app.infrastructure.commands import (get_authenticated_user_id,
-                                         register_playlist, register_user, register_music_in_playlist)
+                                         register_playlist, register_user, register_music_in_playlist, search_music)
 from app.infrastructure.database import start_users_database_connection
 
 app = Flask(__name__)
@@ -15,11 +15,14 @@ def login():
 
     connection = start_users_database_connection()
     user_id = get_authenticated_user_id(connection, email, password)
+    connection.close()
+    
     if user_id:
         session["USER_ID"] = user_id
         return jsonify({'message': 'Login successful', 'user_id': user_id})
     else:
         return jsonify({'message': 'Invalid email or password'})
+    
 
 @app.route('/logout', methods=['POST']) # type:ignore
 def logout():
@@ -31,13 +34,16 @@ def register():
     email = request.json.get("email")
     password = request.json.get("password")
 
+    connection = start_users_database_connection()
     try:
-        connection = start_users_database_connection()
         register_user(connection, email, password)
         return jsonify({'message': 'User registered successfully'})
     
     except EmailAlreadyRegisteredException:
         return jsonify({'message': 'Email already registered'}), 400
+    
+    finally:
+        connection.close()
 
 @app.route('/playlist/create', methods=['POST']) # type:ignore
 def create_playlist():
@@ -84,6 +90,22 @@ def add_music_to_playlist():
     finally:
         connection.close()
 
+@app.route('/music/search', methods=['GET']) # type:ignore
+def endpoint_search_music():
+    search_term = request.args.get("q")
+    if search_term is None:
+        return jsonify({'message': 'Missing search term'}), 400
+
+    connection = start_users_database_connection()
+    try:
+        results = search_music(connection, search_term)
+        return results
+    
+    except Exception:
+        return jsonify({'message': 'Unexpected issue'}), 500
+
+    finally:
+        connection.close()
 
 if __name__ == '__main__':
     app.run()
