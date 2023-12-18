@@ -85,10 +85,19 @@ if selected=="Playlists":
         musics = do_show_playlist(st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST])
         if len(musics) == 0:
             st.warning("Playlist vazia")
-        
         else:
             for music in musics:
                 list_musics(musics, False)
+
+        st.subheader("Adicionar músicas à playlist")
+        title = st.text_input("Procure por uma música...", "")
+        if title:
+            results = do_search(title)
+            if len(results) == 0:
+                st.error("Nenhuma música encontrada")
+            
+            else:
+                list_musics(results, True)
 
     else:
         with st.form(key="create_playlist_form"):
@@ -118,12 +127,6 @@ if selected=="Playlists":
                 if col2.button(key=unique_button_key, label="Explorar"):
                     st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] = playlist["id"]
                     st.rerun()
-                
-                # st.write(f"Total de músicas: {playlist['total_musics']}")
-                # st.write(f"Total de minutos: {playlist['total_minutes']}")
-                # st.write(f"Total de horas: {playlist['total_hours']}")
-
-
 
     # st.subheader("Playlists dos seus gêneros favoritos")
     # st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Pop", "Eletrônica", "Rock", "Jazz"], width=150)
