@@ -66,14 +66,17 @@ def endpoint_register():
 
 @app.route("/playlist/create", methods=['POST']) # type:ignore
 def endpoint_create_playlist():
-    user_id = session.get("USER_ID")
-
-    if not user_id:
-        return jsonify({'message': 'User not logged in'}), 401
-
     connection = start_users_database_connection()
     try:
+        user_id = request.json.get("user_id")
         playlist_name = request.json.get("playlist_name")
+
+        if not user_id:
+            return jsonify({'message': 'Missing user_id'}), 400
+        if not playlist_name:
+            return jsonify({'message': 'Missing playlist_name'}), 400
+        # TODO: test this
+
         register_playlist(connection, playlist_name, user_id)
         return jsonify({'message': 'Playlist created successfully'})
     

@@ -15,7 +15,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 from streamlit_searchbox import st_searchbox
 
-from app.frontend.bff import do_login, do_logout, do_register, do_search
+from app.frontend.bff import do_create_playlist, do_login, do_logout, do_register, do_search
 
 SESSION_USER_ID = "user_id"
 SESSION_SHOULD_DISPLAY_LOGIN = "should_display_login_success"
@@ -70,6 +70,22 @@ if selected=="Descobrir":
 
 if selected=="Playlists":
     st_searchbox(search_function="List", placeholder="Procure por um gênero")
+
+    if st.session_state[SESSION_USER_ID] is None:
+        st.error("Faça login para criar uma playlist")
+
+    else:
+        with st.form(key="create_playlist_form"):
+            st.subheader("Crie uma playlist")
+            name = st.text_input("Nome da playlist")
+            submitted = st.form_submit_button("Criar")
+            if submitted:
+                response = do_create_playlist(st.session_state[SESSION_USER_ID], name)
+                if not response:
+                    st.error("Erro ao criar playlist.")
+                else:
+                    st.success("Playlist criada com sucesso!")
+
     st.subheader("Playlists dos seus gêneros favoritos")
     st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Pop", "Eletrônica", "Rock", "Jazz"], width=150)
     st.subheader("Playlists salvas")
@@ -91,6 +107,7 @@ if selected=="Perfil":
         logout = st.button(key="logout", label="Logout")
         if logout:
             response = do_logout()
+            # TODO: just do it directly
             if not response:
                 st.error("Erro ao fazer logout")
             else:

@@ -6,6 +6,7 @@ LOGIN_ENDPOINT = "http://127.0.0.1:5000/user/login"
 CHECK_LOGIN_ENDPOINT = "http://127.0.0.1:5000/user/is-logged"
 REGISTER_ENDPOINT = "http://127.0.0.1:5000/user/register"
 LOGOUT_ENDPOINT = "http://127.0.0.1:5000/user/logout"
+CREATE_PLAYLIST_ENDPOINT = "http://127.0.0.1:5000/playlist/create"
 
 def do_check_login():
     response = requests.get(CHECK_LOGIN_ENDPOINT)
@@ -52,3 +53,11 @@ def do_logout() -> bool:
     
     return True
 
+def do_create_playlist(user_id: int, name: str) -> bool:
+    payload = {"user_id": user_id, "playlist_name": name}
+    response = requests.post(CREATE_PLAYLIST_ENDPOINT, json=payload)
+    
+    if response.status_code != 200:
+        return False
+    
+    return True
