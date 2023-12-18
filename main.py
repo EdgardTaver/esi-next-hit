@@ -31,6 +31,7 @@ def endpoint_login():
 
 
 @app.route("/user/is-logged", methods=["GET"]) # type:ignore
+# TODO: this method is not necessary
 def endpoint_is_logged():
     user_id = session.get("USER_ID")
 
@@ -42,6 +43,7 @@ def endpoint_is_logged():
 
 
 @app.route("/user/logout", methods=["GET"]) # type:ignore
+# TODO: this method is not necessary
 def endpoint_logout():
     session.pop("USER_ID", None)
     return jsonify({'message': 'Logout successful'})
