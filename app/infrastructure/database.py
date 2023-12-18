@@ -2,11 +2,9 @@ import sqlite3
 from typing import Optional
 
 from app.config import DATABASE_FILE
-from app.infrastructure.password import encrypt_password
 
 
 def start_users_database_connection() -> sqlite3.Connection:
-    # TODO: integration test?
     conn = sqlite3.connect(DATABASE_FILE)
     return conn
 
@@ -22,8 +20,9 @@ def create_users_table(connection: sqlite3.Connection):
         password TEXT
     )
     """
-
     cursor.execute(create_statement)
+    
+    cursor.close()
     connection.commit()
 
 def create_music_table(connection: sqlite3.Connection):
@@ -39,12 +38,12 @@ def create_music_table(connection: sqlite3.Connection):
         image_url TEXT
     )
     """
-
     cursor.execute(create_statement)
+    
+    cursor.close()
     connection.commit()
 
-def register_music(connection: sqlite3.Connection, title: str, artist: str, genre: str, image_url: str) -> int:
-    # TODO: add testing
+def register_music(connection: sqlite3.Connection, title: str, artist: str, genre: str, image_url: str) -> Optional[int]:
     cursor = connection.cursor()
 
     insert_statement = """
@@ -53,11 +52,11 @@ def register_music(connection: sqlite3.Connection, title: str, artist: str, genr
     """
 
     cursor.execute(insert_statement, (title, artist, genre, image_url))
-    connection.commit()
     
     inserted_music_id = cursor.lastrowid
     cursor.close()
 
+    connection.commit()
     return inserted_music_id
 
 
@@ -73,8 +72,9 @@ def create_playlists_table(connection: sqlite3.Connection):
         FOREIGN KEY (user_id) REFERENCES users (id)
     )
     """
-
     cursor.execute(create_statement)
+    
+    cursor.close()
     connection.commit()
 
 def create_playlist_music_table(connection: sqlite3.Connection):
@@ -89,6 +89,7 @@ def create_playlist_music_table(connection: sqlite3.Connection):
         FOREIGN KEY (music_id) REFERENCES musics (id)
     )
     """
-
     cursor.execute(create_statement)
+    
+    cursor.close()
     connection.commit()
