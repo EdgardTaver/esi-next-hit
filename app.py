@@ -11,7 +11,7 @@ TODOs:
 - [ ] Derive configs from app.config file
 """
 
-from typing import Any, List
+from typing import Any, List, Optional
 import streamlit as st
 from streamlit_option_menu import option_menu
 from streamlit_searchbox import st_searchbox
@@ -20,6 +20,8 @@ import requests
 MUSIC_SEARCH_ENDPOINT = "http://127.0.0.1:5000/music/search"
 LOGIN_ENDPOINT = "http://127.0.0.1:5000/user/login"
 CHECK_LOGIN_ENDPOINT = "http://127.0.0.1:5000/user/is-logged"
+REGISTER_ENDPOINT = "http://127.0.0.1:5000/user/register"
+LOGOUT_ENDPOINT = "http://127.0.0.1:5000/user/logout"
 
 def do_check_login():
     response = requests.get(CHECK_LOGIN_ENDPOINT)
@@ -30,11 +32,14 @@ def do_check_login():
     
     return False
 
-if "is_logged" not in st.session_state:
-    st.session_state["is_logged"] = do_check_login()
+if "user_id" not in st.session_state:
+    st.session_state["user_id"] = None
 
 if "should_display_login_success" not in st.session_state:
     st.session_state["should_display_login_success"] = False
+
+if "should_display_logout_message" not in st.session_state:
+    st.session_state["should_display_logout_message"] = False
 
 st.set_page_config(page_title="NextHit", page_icon=":musical_note:", layout="centered")
 
@@ -58,9 +63,26 @@ def do_search(search_param: str) -> List[Any]:
 
     return response.json()
 
-def do_login(email: str, password: str) -> bool:
+def do_login(email: str, password: str) -> Optional[int]:
     payload = {"email": email, "password": password}
     response = requests.post(LOGIN_ENDPOINT, json=payload)
+    
+    if response.status_code != 200:
+        return None
+    
+    return response.json()["user_id"]
+
+def do_register(email: str, password: str) -> bool:
+    payload = {"email": email, "password": password}
+    response = requests.post(REGISTER_ENDPOINT, json=payload)
+    
+    if response.status_code != 200:
+        return False
+    
+    return True
+
+def do_logout() -> bool:
+    response = requests.get(LOGOUT_ENDPOINT)
     
     if response.status_code != 200:
         return False
@@ -101,21 +123,31 @@ if selected=="Playlists":
     st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Mix melhores", "Chiclete", "Relaxando", "Focado"], width=150)
 
 if selected=="Perfil":
-    # TODO: find out a way to control a sort of login state
-
-    st.subheader("Login")
+    if st.session_state["should_display_login_success"]:
+        st.success("Login realizado com sucesso!")
+        st.session_state["should_display_login_success"] = False
     
-    if st.session_state["is_logged"]:
-        if st.session_state["should_display_login_success"]:
-            st.success("Login realizado com sucesso!")
-            st.session_state["should_display_login_success"] = False
+    if st.session_state["should_display_logout_message"]:
+        st.warning("Logout realizado com sucesso. Até breve!")
+        st.session_state["should_display_logout_message"] = False
+    
+    if st.session_state["user_id"] is not None :
         
         st.write("Olá!")
         # TODO: add more info
-        st.button(key="logout", label="Logout")
+        logout = st.button(key="logout", label="Logout")
+        if logout:
+            response = do_logout()
+            if not response:
+                st.error("Erro ao fazer logout")
+            else:
+                st.session_state["user_id"] = None
+                st.session_state["should_display_logout_message"] = True
     
     else:
         with st.form(key="login_form"):
+            st.subheader("Faça login para acessar seu perfil")
+
             email = st.text_input("Email")
             password = st.text_input("Password", type="password")
 
@@ -125,8 +157,23 @@ if selected=="Perfil":
                 if not login_response:
                     st.error("E-mail ou senha inválidos.")
                 else:
-                    st.session_state["is_logged"] = True
+                    st.session_state["user_id"] = login_response
                     st.session_state["should_display_login_success"] = True
+        
+        # with st.form(key="register_form"):
+        #     st.subheader("Não possui uma conta? Cadastre-se!")
+
+        #     email = st.text_input("Email")
+        #     password = st.text_input("Password", type="password")
+
+        #     submitted = st.form_submit_button("Cadastrar")
+        #     if submitted:
+        #         register_response = do_register(email, password)
+        #         if not register_response:
+        #             st.error("E-mail já cadastrado.")
+        #         else:
+        #             st.session_state["is_logged"] = True
+        #             st.session_state["should_display_login_success"] = True
 
     # st.subheader("Nome do Perfil")
     # st.image("axolote.jpg", width=100)
