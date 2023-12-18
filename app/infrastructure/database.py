@@ -2,8 +2,6 @@ import sqlite3
 from typing import Optional
 
 from app.config import DATABASE_FILE
-from app.exceptions import (EmailAlreadyRegisteredException, MusicAlreadyInPlaylistException, MusicNotFoundException,
-                            PlaylistAlreadyExistsException, PlaylistNotFoundException)
 from app.infrastructure.password import encrypt_password
 
 
@@ -94,39 +92,3 @@ def create_playlist_music_table(connection: sqlite3.Connection):
 
     cursor.execute(create_statement)
     connection.commit()
-
-
-def register_user(connection: sqlite3.Connection, email: str, password: str):
-    cursor = connection.cursor()
-
-    select_statement = """
-    SELECT email FROM users WHERE email=?
-    """
-
-    cursor.execute(select_statement, (email,))
-    result = cursor.fetchone()
-
-    if result is not None:
-        raise EmailAlreadyRegisteredException()
-
-    insert_statement = """
-    INSERT INTO users (email, password)
-    VALUES (?, ?)
-    """
-
-    encrypted_password = encrypt_password(password)
-    cursor.execute(insert_statement, (email, encrypted_password))
-    connection.commit()
-
-def get_authenticated_user_id(connection: sqlite3.Connection, email: str, password: str) -> Optional[int]:
-    cursor = connection.cursor()
-
-    cursor.execute("SELECT id, password FROM users WHERE email=?", (email,))
-    result = cursor.fetchone()
-
-    if result is not None:
-        user_id, stored_password = result
-        if encrypt_password(password) == stored_password:
-            return user_id
-
-    return None
