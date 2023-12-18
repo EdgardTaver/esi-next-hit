@@ -6,8 +6,12 @@ from app.exceptions import (EmailAlreadyRegisteredException,
                             MusicNotFoundException,
                             PlaylistAlreadyExistsException,
                             PlaylistNotFoundException)
-from app.infrastructure.commands import (get_authenticated_user_id, register_music_in_playlist,
-                                         register_playlist, register_user, search_music, list_playlists_for_user)
+from app.infrastructure.commands import (get_authenticated_user_id,
+                                         list_musics_in_playlist,
+                                         list_playlists_for_user,
+                                         register_music_in_playlist,
+                                         register_playlist, register_user,
+                                         search_music)
 from app.infrastructure.database import (create_music_table,
                                          create_playlist_music_table,
                                          create_playlists_table,
@@ -267,6 +271,79 @@ def test_list_playlists_for_user_no_playlists_found():
     non_existing_user_id = 2
 
     result = list_playlists_for_user(connection, non_existing_user_id)
+    assert len(result) == 0
+    
+    connection.close()
+
+
+def test_list_musics_in_playlist_regular_scenario():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_music_table(connection)
+    create_playlist_music_table(connection)
+
+    any_user_id = 1
+    playlist_id = register_playlist(connection, "My Playlist", any_user_id)
+    assert playlist_id is not None
+    
+    music_id_1 = register_music(connection, "Sorry", "Justin Bieber", "norwegian black metal", "url/image_1")
+    assert music_id_1 is not None
+    
+    music_id_2 = register_music(connection, "Calabasas", "Tritonal", "electronic music", "url/image_2")
+    assert music_id_2 is not None
+
+    register_music_in_playlist(connection, playlist_id, music_id_1)
+    register_music_in_playlist(connection, playlist_id, music_id_2)
+
+    result = list_musics_in_playlist(connection, playlist_id)
+    assert len(result) == 2
+    assert result[0]["id"] == music_id_1
+    assert result[0]["title"] == "Sorry"
+    assert result[0]["artist"] == "Justin Bieber"
+    assert result[0]["genre"] == "norwegian black metal"
+    assert result[0]["image_url"] == "url/image_1"
+
+    assert result[1]["id"] == music_id_2
+    assert result[1]["title"] == "Calabasas"
+    assert result[1]["artist"] == "Tritonal"
+    assert result[1]["genre"] == "electronic music"
+    assert result[1]["image_url"] == "url/image_2"
+    
+    connection.close()
+
+def test_list_musics_in_playlist_empty_playlist():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_music_table(connection)
+    create_playlist_music_table(connection)
+
+    any_user_id = 1
+    playlist_id = register_playlist(connection, "My Playlist", any_user_id)
+    assert playlist_id is not None
+
+    result = list_musics_in_playlist(connection, playlist_id)
+    assert len(result) == 0
+    
+    connection.close()
+
+def test_list_musics_in_playlist_non_existent_playlist():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_music_table(connection)
+    create_playlist_music_table(connection)
+
+    any_user_id = 1
+    playlist_id = register_playlist(connection, "My Playlist", any_user_id)
+    assert playlist_id is not None
+
+    music_id = register_music(connection, "Sorry", "Justin Bieber", "norwegian black metal", "url/image_1")
+    assert music_id is not None
+
+    register_music_in_playlist(connection, playlist_id, music_id)
+
+    non_existent_playlist_id = playlist_id + 1
+
+    result = list_musics_in_playlist(connection, non_existent_playlist_id)
     assert len(result) == 0
     
     connection.close()

@@ -131,6 +131,23 @@ def list_playlists_for_user(connection: sqlite3.Connection, user_id: int):
     cursor.close()
     return results
 
+def list_musics_in_playlist(connection: sqlite3.Connection, playlist_id: int):
+    cursor = connection.cursor()
+
+    select_musics_statement = """
+    SELECT * FROM playlist_music
+    INNER JOIN musics ON playlist_music.music_id=musics.id
+    WHERE playlist_id=?
+    """
+    cursor.execute(select_musics_statement, (playlist_id,))
+    
+    names = [description[0] for description in cursor.description]
+    results = [dict(zip(names, row)) for row in cursor.fetchall()]
+
+    cursor.close()
+    return results
+
+
 
 def search_music(connection: sqlite3.Connection, search_string: str):
     cursor = connection.cursor()
