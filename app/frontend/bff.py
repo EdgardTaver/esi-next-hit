@@ -20,7 +20,6 @@ def do_check_login():
     
     return False
 
-
 def do_search(search_param: str) -> List[Any]:
     params = {"q": search_param}
     response = requests.get(MUSIC_SEARCH_ENDPOINT, params=params)

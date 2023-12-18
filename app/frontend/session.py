@@ -4,6 +4,7 @@ SESSION_USER_ID = "user_id"
 SESSION_SHOULD_DISPLAY_LOGIN = "should_display_login_success"
 SESSION_SHOULD_DISPLAY_LOGOUT = "should_display_logout_message"
 SESSION_SHOULD_EXPLORE_PLAYLIST = "should_explore_playlist"
+SESSION_PLAYLIST_BEING_EXPLORED = "playlist_being_explored"
 SESSION_SHOULD_DISPLAY_MUSIC_ADDED = "should_display_music_added_message"
 SESSION_CLEAR_SEARCH_RESULTS = "should_clear_search_results"
 
@@ -20,6 +21,9 @@ def initialize_session_variables():
 
     if SESSION_SHOULD_EXPLORE_PLAYLIST not in st.session_state:
         st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] = None
+
+    if SESSION_PLAYLIST_BEING_EXPLORED not in st.session_state:
+        st.session_state[SESSION_PLAYLIST_BEING_EXPLORED] = None
 
     if SESSION_SHOULD_DISPLAY_MUSIC_ADDED not in st.session_state:
         st.session_state[SESSION_SHOULD_DISPLAY_MUSIC_ADDED] = False

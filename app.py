@@ -18,7 +18,7 @@ from app.frontend.bff import (do_create_playlist, do_list_playlists, do_login,
                               do_logout, do_register, do_search,
                               do_show_playlist)
 from app.frontend.components import list_musics
-from app.frontend.session import SESSION_CLEAR_SEARCH_RESULTS, SESSION_SHOULD_DISPLAY_LOGIN, SESSION_SHOULD_DISPLAY_LOGOUT, SESSION_SHOULD_DISPLAY_MUSIC_ADDED, SESSION_SHOULD_EXPLORE_PLAYLIST, SESSION_USER_ID, initialize_session_variables
+from app.frontend.session import SESSION_CLEAR_SEARCH_RESULTS, SESSION_PLAYLIST_BEING_EXPLORED, SESSION_SHOULD_DISPLAY_LOGIN, SESSION_SHOULD_DISPLAY_LOGOUT, SESSION_SHOULD_DISPLAY_MUSIC_ADDED, SESSION_SHOULD_EXPLORE_PLAYLIST, SESSION_USER_ID, initialize_session_variables
 
 initialize_session_variables()
 
@@ -61,9 +61,10 @@ if selected=="Playlists":
     elif st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] is not None:
         if st.button(key="playlist_exploring_go_back", label="Voltar"):
             st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] = None
+            st.session_state[SESSION_PLAYLIST_BEING_EXPLORED] = None
             st.rerun()
 
-        st.header(f"Explorando playlist {st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST]}")
+        st.header(st.session_state[SESSION_PLAYLIST_BEING_EXPLORED])
 
         if st.session_state[SESSION_SHOULD_DISPLAY_MUSIC_ADDED]:
             st.success("Música adicionada com sucesso!")
@@ -114,6 +115,7 @@ if selected=="Playlists":
                 unique_button_key = f"explore_{playlist['id']}"
                 if col2.button(key=unique_button_key, label="Explorar"):
                     st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST] = playlist["id"]
+                    st.session_state[SESSION_PLAYLIST_BEING_EXPLORED] = playlist["name"]
                     st.rerun()
 
     # st.subheader("Playlists dos seus gêneros favoritos")
