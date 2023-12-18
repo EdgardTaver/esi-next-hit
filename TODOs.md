@@ -3,9 +3,9 @@
 
 - [ ] Backend:
   - [X] Login.
-  - [ ] Criação de playlists.
+  - [X] Criação de playlists.
   - [ ] Músicas semelhantes.
-  - [ ] Playlists automáticas.
+  - [ ] Playlists automáticas (estou considerando não fazer...)
 
 - [ ] Possíveis testes (para vídeo):
   - [ ] Tentar longar com conta que existe, mas senha errada.
