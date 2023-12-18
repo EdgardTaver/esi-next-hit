@@ -17,6 +17,7 @@ from streamlit_searchbox import st_searchbox
 
 from app.frontend.bff import (do_create_playlist, do_list_playlists, do_login,
                               do_logout, do_register, do_search, do_show_playlist)
+from app.frontend.components import list_musics
 
 SESSION_USER_ID = "user_id"
 SESSION_SHOULD_DISPLAY_LOGIN = "should_display_login_success"
@@ -57,13 +58,7 @@ if selected=="Descobrir":
             st.error("Nenhuma música encontrada")
         
         else:
-            for music in results:
-                col1, col2 = st.columns((1,2.75))
-                col1.image(music["image_url"], width=150)
-                col2.subheader(music["title"])
-                col2.write(music["artist"])
-                col2.write(f"Gênero: {music['genre']}")
-                col2.button(key=music["id"], label="Adicionar à playlist")
+            list_musics(results)
 
     st.subheader("Descoberta diária")
     st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Playlist Diária", "Descubra: MPB", "Descubra: Rock"], width=150)
