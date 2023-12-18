@@ -117,6 +117,21 @@ def register_music_in_playlist(connection: sqlite3.Connection, playlist_id: int,
     cursor.close()
     connection.commit()
 
+def list_playlists_for_user(connection: sqlite3.Connection, user_id: int):
+    cursor = connection.cursor()
+
+    select_playlists_statement = """
+    SELECT * FROM playlists WHERE user_id=?
+    """
+    cursor.execute(select_playlists_statement, (user_id,))
+    
+    names = [description[0] for description in cursor.description]
+    results = [dict(zip(names, row)) for row in cursor.fetchall()]
+
+    cursor.close()
+    return results
+
+
 def search_music(connection: sqlite3.Connection, search_string: str):
     cursor = connection.cursor()
 

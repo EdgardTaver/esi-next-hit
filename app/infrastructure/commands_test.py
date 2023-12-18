@@ -7,7 +7,7 @@ from app.exceptions import (EmailAlreadyRegisteredException,
                             PlaylistAlreadyExistsException,
                             PlaylistNotFoundException)
 from app.infrastructure.commands import (get_authenticated_user_id, register_music_in_playlist,
-                                         register_playlist, register_user, search_music)
+                                         register_playlist, register_user, search_music, list_playlists_for_user)
 from app.infrastructure.database import (create_music_table,
                                          create_playlist_music_table,
                                          create_playlists_table,
@@ -222,6 +222,55 @@ def test_register_music_in_playlist_when_music_already_in_playlist():
 
     cursor.close()
     connection.close()
+
+def test_list_playlists_for_user_regular_scenario():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_music_table(connection)
+    create_playlist_music_table(connection)
+
+    user_id = 1
+
+    playlist_id = register_playlist(connection, "My Playlist", user_id)
+    assert playlist_id is not None
+    
+    music_id = register_music(connection, "music 1", "artist 1", "genre 1", "any.url")
+    assert music_id is not None
+
+    register_music_in_playlist(connection, playlist_id, music_id)
+
+    result = list_playlists_for_user(connection, user_id)
+    assert len(result) == 1
+    assert result[0]["id"] == playlist_id
+    assert result[0]["name"] == "My Playlist"
+    assert result[0]["user_id"] == user_id
+    
+    connection.close()
+
+
+def test_list_playlists_for_user_no_playlists_found():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_music_table(connection)
+    create_playlist_music_table(connection)
+
+    existing_user_id = 1
+
+    playlist_id = register_playlist(connection, "My Playlist", existing_user_id)
+    assert playlist_id is not None
+    
+    music_id = register_music(connection, "music 1", "artist 1", "genre 1", "any.url")
+    assert music_id is not None
+
+    register_music_in_playlist(connection, playlist_id, music_id)
+
+    non_existing_user_id = 2
+
+    result = list_playlists_for_user(connection, non_existing_user_id)
+    assert len(result) == 0
+    
+    connection.close()
+
 
 def test_search_music_regular_scenario():
     connection = start_sqlite_in_memory_database_connection()
