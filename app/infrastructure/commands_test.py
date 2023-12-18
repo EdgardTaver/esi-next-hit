@@ -158,6 +158,7 @@ def test_register_music_in_playlist_when_playlist_not_found():
 
     invalid_playlist_id = 1
     existing_music_id = register_music(connection, "music 1", "artist 1", "genre 1", "any.url")
+    assert existing_music_id is not None
 
     with pytest.raises(PlaylistNotFoundException):
         register_music_in_playlist(connection, invalid_playlist_id, existing_music_id)
@@ -172,7 +173,11 @@ def test_register_music_in_playlist_when_music_not_found():
     create_playlist_music_table(connection)
 
     existing_playlist_id = register_playlist(connection, "My Playlist", 1)
+    assert existing_playlist_id is not None
+
     existing_music_id = register_music(connection, "music 1", "artist 1", "genre 1", "any.url")
+    assert existing_music_id is not None
+
     invalid_music_id = existing_music_id + 1
 
     with pytest.raises(MusicNotFoundException):
@@ -188,7 +193,10 @@ def test_register_music_in_playlist_when_music_not_in_playlist():
     create_playlist_music_table(connection)
 
     playlist_id = register_playlist(connection, "My Playlist", 1)
+    assert playlist_id is not None
+
     music_id = register_music(connection, "music 1", "artist 1", "genre 1", "any.url")
+    assert music_id is not None
 
     register_music_in_playlist(connection, playlist_id, music_id)
 
@@ -211,7 +219,10 @@ def test_register_music_in_playlist_when_music_already_in_playlist():
     create_playlist_music_table(connection)
 
     playlist_id = register_playlist(connection, "My Playlist", 1)
+    assert playlist_id is not None
+    
     music_id = register_music(connection, "music 1", "artist 1", "genre 1", "any.url")
+    assert music_id is not None
 
     register_music_in_playlist(connection, playlist_id, music_id)
 
