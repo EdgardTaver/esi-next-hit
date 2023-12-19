@@ -12,26 +12,22 @@ def no_op_button(unique_key: str, instance: Any, music_id: int):
     pass
 
 def add_to_playlist_button(unique_key: str, instance: Any, music_id: int):
-    unique_button_key = f"{unique_key}_add_music_{music_id}"
-    print(f"totally unique: {unique_button_key}")
-
+    unique_button_key = f"{unique_key}_add_music"
     if instance.button(key=unique_button_key, label="Adicionar à playlist"):
-        print("At least here?")
-
         response = do_add_music_to_playlist(
             st.session_state[SESSION_SHOULD_EXPLORE_PLAYLIST],
             music_id)
 
         if not response:
-            print("WTFFFFF")
             st.error("Erro ao adicionar música à playlist.")
         else:
-            print("HEEEEEY, YOU GOT HERE")
             st.session_state[SESSION_SHOULD_DISPLAY_MUSIC_ADDED] = True
             st.session_state[SESSION_CLEAR_SEARCH_RESULTS] = True
-            st.rerun()
+
 
 def list_musics(unique_key: str, musics: List[Dict[str, Any]], interaction_button: Callable[[str, Any, int], None] = no_op_button):
+    i = 1
+    
     for music in musics:
         col1, col2 = st.columns((1,2.75))
         col1.image(music["image_url"], width=150)
@@ -39,7 +35,8 @@ def list_musics(unique_key: str, musics: List[Dict[str, Any]], interaction_butto
         col2.write(music["artist"])
         col2.write(f"Gênero: {music['genre']}")
 
-        interaction_button(unique_key, col2, music["id"])
+        interaction_button(f"{unique_key}_{i}", col2, music["id"])
+        i += 1
 
 def music_search_box(unique_key: str, interaction_button: Callable[[str, Any, int], None] = no_op_button):
     music_search_term = st.text_input(key=unique_key, label="Procure por uma música...")
