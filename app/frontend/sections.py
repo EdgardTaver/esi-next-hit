@@ -1,7 +1,7 @@
 import streamlit as st
 
 from app.frontend.bff import (do_create_playlist, do_list_playlists, do_login,
-                              do_logout, do_register, do_search,
+                              do_logout, do_register, do_get_music_recommendations_for_user,
                               do_show_playlist)
 from app.frontend.components import add_to_playlist_button, list_musics, music_search_box
 from app.frontend.session import (SESSION_CLEAR_SEARCH_RESULTS,
@@ -43,6 +43,11 @@ def explore_playlist_section():
     st.subheader("Adicionar músicas à playlist")
     
     music_search_box("playlist_search_bar", add_to_playlist_button)
+
+    recommendations = do_get_music_recommendations_for_user(st.session_state[SESSION_USER_ID])
+    if len(recommendations) > 0:
+        st.write("Recomendações:")
+        list_musics(recommendations, add_to_playlist_button)
 
     st.session_state[SESSION_CLEAR_SEARCH_RESULTS] = False
 
