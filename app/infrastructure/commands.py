@@ -161,7 +161,7 @@ def search_music(connection: sqlite3.Connection, search_string: str):
     select_music_statement = """
     SELECT * FROM musics WHERE title LIKE ?
     ORDER BY LOWER(title) ASC, id ASC
-    LIMIT 10
+    LIMIT 5
     """
     cursor.execute(select_music_statement, ('%' + search_string + '%',))
     
@@ -193,7 +193,7 @@ def list_music_ids_for_user(connection: sqlite3.Connection, user_id: int) -> Lis
     cursor = connection.cursor()
 
     select_statement = """
-    SELECT musics.id FROM musics
+    SELECT distinct(musics.id) FROM musics
     INNER JOIN playlist_music ON musics.id=playlist_music.music_id
     INNER JOIN playlists ON playlist_music.playlist_id=playlists.id
     WHERE playlists.user_id=?
