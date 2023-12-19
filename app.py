@@ -11,7 +11,7 @@ from app.frontend.bff import do_search
 from app.frontend.components import list_musics
 from app.frontend.session import initialize_session_variables
 
-from app.frontend.sections import playlist_section, profile_section
+from app.frontend.sections import explore_section, playlist_section, profile_section
 
 initialize_session_variables()
 
@@ -29,17 +29,8 @@ selected = option_menu(
 )
 
 if selected=="Descobrir":
-    title = st.text_input("Procure por uma música...", "")
-    if title:
-        results = do_search(title)
-        if len(results) == 0:
-            st.error("Nenhuma música encontrada")
-        
-        else:
-            list_musics(results)
+    explore_section()
 
-    st.subheader("Descoberta diária")
-    st.image(["playlist.jpg", "playlist.jpg", "playlist.jpg"], caption=["Playlist Diária", "Descubra: MPB", "Descubra: Rock"], width=150)
     st.subheader("Músicas recomendadas")
     st.image(["music.png", "music.png", "music.png", "music.png"], caption=["music 1", "music 2", "music 3", "music 4"], width=150)
     st.subheader("Pop")

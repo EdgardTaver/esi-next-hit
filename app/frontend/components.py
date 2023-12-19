@@ -2,10 +2,10 @@ from typing import Any, Callable, Dict, List
 
 import streamlit as st
 
-from app.frontend.bff import do_add_music_to_playlist, do_search
+from app.frontend.bff import do_add_music_to_playlist, do_get_music_recommendations_for_user, do_search
 from app.frontend.session import (SESSION_CLEAR_SEARCH_RESULTS,
                                   SESSION_SHOULD_DISPLAY_MUSIC_ADDED,
-                                  SESSION_SHOULD_EXPLORE_PLAYLIST)
+                                  SESSION_SHOULD_EXPLORE_PLAYLIST, SESSION_USER_ID)
 
 
 def no_op_button(instance: Any, music_id: int):
@@ -44,3 +44,9 @@ def music_search_box(unique_key: str, interaction_button: Callable[[Any, int], N
         
         else:
             list_musics(results, interaction_button)
+    
+    else:
+        recommendations = do_get_music_recommendations_for_user(st.session_state[SESSION_USER_ID])
+        if len(recommendations) > 0:
+            st.markdown("**Recomendações:**")
+            list_musics(recommendations, add_to_playlist_button)

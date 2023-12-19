@@ -12,6 +12,9 @@ from app.frontend.session import (SESSION_CLEAR_SEARCH_RESULTS,
                                   SESSION_SHOULD_EXPLORE_PLAYLIST,
                                   SESSION_USER_ID)
 
+def explore_section():
+    music_search_box("explore_search_bar", add_to_playlist_button)
+
 def playlist_section():
     if st.session_state[SESSION_USER_ID] is None:
         st.error("Faça login para criar uma playlist")
@@ -43,11 +46,6 @@ def explore_playlist_section():
     st.subheader("Adicionar músicas à playlist")
     
     music_search_box("playlist_search_bar", add_to_playlist_button)
-
-    recommendations = do_get_music_recommendations_for_user(st.session_state[SESSION_USER_ID])
-    if len(recommendations) > 0:
-        st.write("Recomendações:")
-        list_musics(recommendations, add_to_playlist_button)
 
     st.session_state[SESSION_CLEAR_SEARCH_RESULTS] = False
 
