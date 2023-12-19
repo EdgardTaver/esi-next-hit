@@ -255,3 +255,30 @@ def test_endpoint_show_playlist():
     assert response.json is not None
     assert len(response.json) == 1
     assert response.json[0]["name"] == "Cachorro Banana"
+
+
+def test_endpoint_search_music_missing_search_term():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    response = app.test_client().get(f"/music/search")
+
+    assert response.status_code == 400
+
+
+def test_endpoint_search_music_valid_response():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    cmd.search_music_response = [{"name": "Cachorro Banana"}]
+
+    response = app.test_client().get(f"/music/search?q=banana")
+
+    assert response.status_code == 200
+    assert response.json is not None
+    assert len(response.json) == 1
+    assert response.json[0]["name"] == "Cachorro Banana"

@@ -62,6 +62,7 @@ class MockedCommands(Commands):
     list_genres_for_user_response: Any
     list_playlists_for_user_response: Any
     list_musics_in_playlist_response: Any
+    search_music_response: Any
 
     def __init__(self):
         self.register_music_in_playlist_called = False
@@ -88,7 +89,7 @@ class MockedCommands(Commands):
         return self.list_musics_in_playlist_response
     
     def search_music(self, connection: sqlite3.Connection, search_term: str) -> Any:
-        return None
+        return self.search_music_response
     
     def get_music_recommendations_for_user(self, connection: sqlite3.Connection, user_id: int) -> Any:
         return None
