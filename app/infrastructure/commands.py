@@ -188,3 +188,22 @@ def list_genres_for_user(connection: sqlite3.Connection, user_id: int) -> List[s
     cursor.close()
 
     return results
+
+def list_music_ids_for_user(connection: sqlite3.Connection, user_id: int) -> List[int]:
+    cursor = connection.cursor()
+
+    select_statement = """
+    SELECT musics.id FROM musics
+    INNER JOIN playlist_music ON musics.id=playlist_music.music_id
+    INNER JOIN playlists ON playlist_music.playlist_id=playlists.id
+    WHERE playlists.user_id=?
+    ORDER BY 1 ASC
+    """
+
+    cursor.execute(select_statement, (user_id,))
+
+    results = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+
+    return results
+
