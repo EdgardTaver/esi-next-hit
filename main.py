@@ -66,7 +66,7 @@ def endpoint_register():
 
     connection = start_users_database_connection()
     try:
-        user_id = register_user(connection, email, password)
+        user_id = register_user(connection, email, password, name)
         return jsonify({'message': 'User registered successfully', 'user_id': user_id, 'name': name})
     
     except EmailAlreadyRegisteredException:
