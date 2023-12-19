@@ -61,3 +61,78 @@ def test_endpoint_login_valid_response():
     })
 
     assert response.status_code == 200
+
+def test_endpoint_register_missing_email():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+    
+    response = app.test_client().post("/user/register", json={
+        "password": "123456",
+        "name": "Cachorro Banana",
+    })
+
+    assert response.status_code == 400
+
+def test_endpoint_register_missing_password():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+    
+    response = app.test_client().post("/user/register", json={
+        "email": "cachorro@banana.com",
+        "name": "Cachorro Banana",
+    })
+
+    assert response.status_code == 400
+
+def test_endpoint_register_missing_name():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+    
+    response = app.test_client().post("/user/register", json={
+        "email": "cachorro@banana.com",
+        "password": "123456",
+    })
+
+    assert response.status_code == 400
+
+def test_endpoint_register_invalid_response():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    cmd.register_user_response = None
+    
+    response = app.test_client().post("/user/register", json={
+        "email": "cachorro@banana.com",
+        "password": "123456",
+        "name": "Cachorro Banana",
+    })
+
+    assert response.status_code == 500
+
+
+def test_endpoint_register_valid_response():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    cmd.register_user_response = 1
+    
+    response = app.test_client().post("/user/register", json={
+        "email": "cachorro@banana.com",
+        "password": "123456",
+        "name": "Cachorro Banana",
+    })
+
+    assert response.status_code == 200
+    assert response.json is not None
+    assert response.json["user_id"] == 1
+    assert response.json["name"] == "Cachorro Banana"

@@ -58,9 +58,13 @@ class Commands:
 
 class MockedCommands(Commands):
     get_authenticated_user_id_response: Any
+    register_user_response: Any
 
     def start_users_database_connection(self) -> sqlite3.Connection:
         return start_sqlite_in_memory_database_connection()
 
     def get_authenticated_user_id(self, connection: sqlite3.Connection, email: str, password: str) -> Dict[str, Any]:
         return self.get_authenticated_user_id_response
+
+    def register_user(self, connection: sqlite3.Connection, email: str, password: str, name:str) -> Any:
+        return self.register_user_response
