@@ -10,7 +10,7 @@ from app.infrastructure.commands import (get_authenticated_user_id,
                                          list_playlists_for_user,
                                          register_music_in_playlist,
                                          register_playlist, register_user,
-                                         search_music)
+                                         search_music, get_music_recommendations_for_user)
 from app.infrastructure.database import start_users_database_connection
 
 app = Flask(__name__)
@@ -156,6 +156,23 @@ def endpoint_search_music():
     connection = start_users_database_connection()
     try:
         results = search_music(connection, search_term)
+        return results
+    
+    except Exception:
+        return jsonify({'message': 'Unexpected issue'}), 500
+
+    finally:
+        connection.close()
+
+@app.route("/music/recommendations", methods=['POST']) # type:ignore
+def endpoint_get_music_recommendations():
+    connection = start_users_database_connection()
+    try:
+        user_id = request.json.get("user_id")
+        if not user_id:
+            return jsonify({'message': 'Missing user_id'}), 400
+        
+        results = get_music_recommendations_for_user(connection, user_id)
         return results
     
     except Exception:
