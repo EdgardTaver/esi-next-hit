@@ -14,6 +14,12 @@ python -m venv venv
 
 ```bash
 . venv/Scripts/activate
+# windows
+```
+
+```bash
+source .venv/bin/activate
+# unix
 ```
 
 ```bash
