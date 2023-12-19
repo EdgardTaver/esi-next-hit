@@ -19,17 +19,29 @@ app.secret_key = "my-next-hit-secret"
 @app.route("/user/login", methods=['POST']) # type:ignore
 def endpoint_login():
     email = request.json.get("email")
+    if not email:
+        return jsonify({'message': 'Missing email'}), 400
+    
     password = request.json.get("password")
+    if not password:
+        return jsonify({'message': 'Missing password'}), 400
 
     connection = start_users_database_connection()
-    user_id = get_authenticated_user_id(connection, email, password)
-    connection.close()
+    try:
+        result = get_authenticated_user_id(connection, email, password)    
+        if len(result) > 0:
+            return jsonify({
+                "message": "Login successful",
+                "user_id": result["user_id"],
+                "name": result["name"]})
+        else:
+            return jsonify({'message': 'Invalid email or password'}), 401
     
-    if user_id:
-        session["USER_ID"] = user_id
-        return jsonify({'message': 'Login successful', 'user_id': user_id})
-    else:
-        return jsonify({'message': 'Invalid email or password'}), 401
+    except Exception:
+        return jsonify({'message': 'Unexpected issue'}), 500
+
+    finally:
+        connection.close()
 
 
 @app.route("/user/is-logged", methods=["GET"]) # type:ignore

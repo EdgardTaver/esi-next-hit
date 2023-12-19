@@ -1,5 +1,6 @@
+from typing import Any, Dict, List, Optional
+
 import requests
-from typing import Any, List, Optional
 
 MUSIC_SEARCH_ENDPOINT = "http://127.0.0.1:5000/music/search"
 LOGIN_ENDPOINT = "http://127.0.0.1:5000/user/login"
@@ -32,14 +33,14 @@ def do_search(search_param: str) -> List[Any]:
 
     return response.json()
 
-def do_login(email: str, password: str) -> Optional[int]:
+def do_login(email: str, password: str) -> Optional[Dict[str, Any]]:
     payload = {"email": email, "password": password}
     response = requests.post(LOGIN_ENDPOINT, json=payload)
     
     if response.status_code != 200:
         return None
     
-    return response.json()["user_id"]
+    return response.json()
 
 def do_register(email: str, password: str) -> Optional[int]:
     payload = {"email": email, "password": password}

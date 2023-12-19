@@ -1,16 +1,19 @@
 import streamlit as st
 
-from app.frontend.bff import (do_create_playlist, do_get_user_genres, do_list_playlists, do_login,
-                              do_register, do_get_random_music_recommendations,
-                              do_show_playlist)
-from app.frontend.components import add_to_playlist_button, list_musics, music_search_box
+from app.frontend.bff import (do_create_playlist,
+                              do_get_random_music_recommendations,
+                              do_get_user_genres, do_list_playlists, do_login,
+                              do_register, do_show_playlist)
+from app.frontend.components import (add_to_playlist_button, list_musics,
+                                     music_search_box)
 from app.frontend.session import (SESSION_CLEAR_SEARCH_RESULTS,
                                   SESSION_PLAYLIST_BEING_EXPLORED,
                                   SESSION_SHOULD_DISPLAY_LOGIN,
                                   SESSION_SHOULD_DISPLAY_LOGOUT,
                                   SESSION_SHOULD_DISPLAY_MUSIC_ADDED,
                                   SESSION_SHOULD_EXPLORE_PLAYLIST,
-                                  SESSION_USER_ID)
+                                  SESSION_USER_ID, SESSION_USER_NAME)
+
 
 def explore_section():
     music_search_box("explore_search_bar")
@@ -96,10 +99,13 @@ def profile_section():
     if st.session_state[SESSION_USER_ID] is not None :
         st.subheader("Seu perfil")
 
-        st.write("Olá!")
+        user_name = st.session_state[SESSION_USER_NAME]
+        st.write(f"Olá, {user_name}!")
+
         logout = st.button(key="logout", label="Logout")
         if logout:
             st.session_state[SESSION_USER_ID] = None
+            st.session_state[SESSION_USER_NAME] = None
             st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT] = True
         
         genres = do_get_user_genres(st.session_state[SESSION_USER_ID])
@@ -121,7 +127,8 @@ def profile_section():
                 if not login_response:
                     st.error("E-mail ou senha inválidos.")
                 else:
-                    st.session_state[SESSION_USER_ID] = login_response
+                    st.session_state[SESSION_USER_ID] = login_response["user_id"]
+                    st.session_state[SESSION_USER_NAME] = login_response["name"]
                     st.session_state[SESSION_SHOULD_DISPLAY_LOGIN] = True
         
         with st.form(key="register_form"):

@@ -1,5 +1,5 @@
 import sqlite3
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from app.exceptions import (EmailAlreadyRegisteredException,
                             MusicAlreadyInPlaylistException,
@@ -37,20 +37,20 @@ def register_user(connection: sqlite3.Connection, email: str, password: str, nam
     return inserted_user_id
 
 
-def get_authenticated_user_id(connection: sqlite3.Connection, email: str, password: str) -> Optional[int]:
+def get_authenticated_user_id(connection: sqlite3.Connection, email: str, password: str) -> Dict[str, Any]:
     cursor = connection.cursor()
 
-    cursor.execute("SELECT id, password FROM users WHERE email=?", (email,))
+    cursor.execute("SELECT id, password, name FROM users WHERE email=?", (email,))
     result = cursor.fetchone()
 
     cursor.close()
 
     if result is not None:
-        user_id, stored_password = result
+        user_id, stored_password, name = result
         if encrypt_password(password) == stored_password:
-            return user_id
+            return {"user_id": user_id, "name": name}
 
-    return None
+    return {}
 
 
 def register_playlist(connection: sqlite3.Connection, name: str, user_id: int) -> Optional[int]:

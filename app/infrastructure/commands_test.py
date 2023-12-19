@@ -79,7 +79,7 @@ def test_get_authenticated_user_id_when_email_is_not_registered():
     any_password = "password456"
 
     result = get_authenticated_user_id(connection, non_existing_email, any_password)
-    assert result is None
+    assert len(result) == 0
 
     connection.close()
 
@@ -94,7 +94,7 @@ def test_get_authenticated_user_id_when_email_exists_but_password_is_incorrect()
 
     wrong_password = "cachorro_banana"
     result = get_authenticated_user_id(connection, existing_email, wrong_password)
-    assert result is None
+    assert len(result) == 0
 
 def test_get_authenticated_user_id_when_email_exists_and_password_is_correct():
     connection = start_sqlite_in_memory_database_connection()
@@ -103,15 +103,18 @@ def test_get_authenticated_user_id_when_email_exists_and_password_is_correct():
     existing_email_user_1 = "test@example.com"
     existing_password_user_1 = "password123"
     existing_name_1 = "Test User"
-    register_user(connection, existing_email_user_1, existing_password_user_1, existing_name_1)
+    user_id_1 = register_user(connection, existing_email_user_1, existing_password_user_1, existing_name_1)
+    assert user_id_1 is not None
 
     existing_email_user_2 = "test_222@example.com"
     existing_password_user_2 = "password456"
     existing_name_2 = "Test User"
-    register_user(connection, existing_email_user_2, existing_password_user_2, existing_name_2)
+    user_id_2 = register_user(connection, existing_email_user_2, existing_password_user_2, existing_name_2)
+    assert user_id_2 is not None
 
     result = get_authenticated_user_id(connection, existing_email_user_2, existing_password_user_2)
-    assert result == 2
+    assert result["user_id"] == user_id_2
+    assert result["name"] == existing_name_2
 
     connection.close()
 
