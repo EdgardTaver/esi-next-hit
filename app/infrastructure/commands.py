@@ -212,7 +212,7 @@ def get_music_recommendations_for_user(connection: sqlite3.Connection, user_id: 
     known_music_ids = list_music_ids_for_user(connection, user_id)
 
     if len(genre_list) == 0 or len(known_music_ids) == 0:
-        return _get_any_random_musics(
+        return get_any_random_musics(
             connection)
         # get any 5 random musics
         # since we only know the user tastes by the musics in their playlists
@@ -220,10 +220,10 @@ def get_music_recommendations_for_user(connection: sqlite3.Connection, user_id: 
         # guess is our best guess
 
     else:
-        return _get_random_new_musics_for_the_genres_the_user_listens_to(
+        return get_random_new_musics_for_the_genres_the_user_listens_to(
             connection, genre_list, known_music_ids)
 
-def _get_any_random_musics(connection: sqlite3.Connection):
+def get_any_random_musics(connection: sqlite3.Connection):
     cursor = connection.cursor()
 
     select_statement = """
@@ -240,7 +240,7 @@ def _get_any_random_musics(connection: sqlite3.Connection):
 
     return results
 
-def _get_random_new_musics_for_the_genres_the_user_listens_to(connection: sqlite3.Connection, genre_list: List[str], known_music_ids: List[int]):
+def get_random_new_musics_for_the_genres_the_user_listens_to(connection: sqlite3.Connection, genre_list: List[str], known_music_ids: List[int]):
     cursor = connection.cursor()
 
     select_statement = """

@@ -1,7 +1,7 @@
 import streamlit as st
 
 from app.frontend.bff import (do_create_playlist, do_list_playlists, do_login,
-                              do_logout, do_register, do_get_music_recommendations_for_user,
+                              do_logout, do_register, do_get_random_music_recommendations,
                               do_show_playlist)
 from app.frontend.components import add_to_playlist_button, list_musics, music_search_box
 from app.frontend.session import (SESSION_CLEAR_SEARCH_RESULTS,
@@ -13,7 +13,12 @@ from app.frontend.session import (SESSION_CLEAR_SEARCH_RESULTS,
                                   SESSION_USER_ID)
 
 def explore_section():
-    music_search_box("explore_search_bar", add_to_playlist_button)
+    music_search_box("explore_search_bar")
+
+    random_recommendations = do_get_random_music_recommendations()
+    if len(random_recommendations) > 0:
+        st.subheader("Descubra novidades")
+        list_musics(random_recommendations)
 
 def playlist_section():
     if st.session_state[SESSION_USER_ID] is None:

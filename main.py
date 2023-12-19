@@ -5,7 +5,7 @@ from app.exceptions import (EmailAlreadyRegisteredException,
                             MusicNotFoundException,
                             PlaylistAlreadyExistsException,
                             PlaylistNotFoundException)
-from app.infrastructure.commands import (get_authenticated_user_id,
+from app.infrastructure.commands import (get_any_random_musics, get_authenticated_user_id,
                                          list_musics_in_playlist,
                                          list_playlists_for_user,
                                          register_music_in_playlist,
@@ -173,6 +173,19 @@ def endpoint_get_music_recommendations():
             return jsonify({'message': 'Missing user_id'}), 400
         
         results = get_music_recommendations_for_user(connection, user_id)
+        return results
+    
+    except Exception:
+        return jsonify({'message': 'Unexpected issue'}), 500
+
+    finally:
+        connection.close()
+
+@app.route("/music/random-recommendations", methods=['GET']) # type:ignore
+def endpoint_get_music_random_recommendations():
+    connection = start_users_database_connection()
+    try:
+        results = get_any_random_musics(connection)
         return results
     
     except Exception:

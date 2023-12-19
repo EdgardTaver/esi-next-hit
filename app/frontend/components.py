@@ -49,4 +49,4 @@ def music_search_box(unique_key: str, interaction_button: Callable[[Any, int], N
         recommendations = do_get_music_recommendations_for_user(st.session_state[SESSION_USER_ID])
         if len(recommendations) > 0:
             st.markdown("**Recomendações:**")
-            list_musics(recommendations, add_to_playlist_button)
+            list_musics(recommendations, interaction_button)

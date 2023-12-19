@@ -11,6 +11,7 @@ LIST_PLAYLISTS_ENDPOINT = "http://127.0.0.1:5000/playlist/list"
 SHOW_PLAYLIST_ENDPOINT = "http://127.0.0.1:5000/playlist/{playlist_id}/show"
 ADD_MUSIC_TO_PLAYLIST_ENDPOINT = "http://127.0.0.1:5000/playlist/{playlist_id}/add-music"
 MUSIC_RECOMMENDATIONS_ENDPOINT = "http://127.0.0.1:5000/music/recommendations"
+RANDOM_MUSIC_RECOMMENDATIONS_ENDPOINT = "http://127.0.0.1:5000/music/random-recommendations"
 
 def do_check_login():
     response = requests.get(CHECK_LOGIN_ENDPOINT)
@@ -94,6 +95,15 @@ def do_add_music_to_playlist(playlist_id: int, music_id: int) -> bool:
 def do_get_music_recommendations_for_user(user_id: int) -> List[Any]:
     payload = {"user_id": user_id}
     response = requests.post(MUSIC_RECOMMENDATIONS_ENDPOINT, json=payload)
+    
+    if response.status_code != 200:
+        return []
+    
+    return response.json()
+
+
+def do_get_random_music_recommendations() -> List[Any]:
+    response = requests.get(RANDOM_MUSIC_RECOMMENDATIONS_ENDPOINT)
     
     if response.status_code != 200:
         return []

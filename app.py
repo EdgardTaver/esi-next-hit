@@ -1,7 +1,3 @@
-## pip install streamlit
-## pip install streamlit_option_menu
-## pip install streamlit_searchbox
-
 ## python -m streamlit run app.py
 
 import streamlit as st
@@ -30,13 +26,6 @@ selected = option_menu(
 
 if selected=="Descobrir":
     explore_section()
-
-    st.subheader("Músicas recomendadas")
-    st.image(["music.png", "music.png", "music.png", "music.png"], caption=["music 1", "music 2", "music 3", "music 4"], width=150)
-    st.subheader("Pop")
-    st.image(["music.png", "music.png", "music.png", "music.png"], caption=["music 1", "music 2", "music 3", "music 4"], width=150)
-    st.subheader("Eletrônica")
-    st.image(["music.png", "music.png", "music.png", "music.png"], caption=["music 1", "music 2", "music 3", "music 4"], width=150) 
 
 if selected=="Playlists":
     playlist_section()
