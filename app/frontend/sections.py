@@ -21,7 +21,7 @@ def explore_section():
     random_recommendations = do_get_random_music_recommendations()
     if len(random_recommendations) > 0:
         st.subheader("Descubra novidades")
-        list_musics(random_recommendations)
+        list_musics("random_explore", random_recommendations)
 
 def playlist_section():
     if st.session_state[SESSION_USER_ID] is None:
@@ -49,7 +49,7 @@ def explore_playlist_section():
     if len(musics) == 0:
         st.warning("Playlist vazia")
     else:
-        list_musics(musics)
+        list_musics("playlist_show", musics)
 
     st.subheader("Adicionar músicas à playlist")
     
