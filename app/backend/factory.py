@@ -59,7 +59,6 @@ class Commands:
 class MockedCommands(Commands):
     get_authenticated_user_id_response: Any
     register_user_response: Any
-    register_playlist_response: Any
     list_genres_for_user_response: Any
 
 
@@ -73,7 +72,7 @@ class MockedCommands(Commands):
         return self.register_user_response
 
     def register_playlist(self, connection: sqlite3.Connection, name: str, user_id: int) -> Any:
-        return self.register_playlist_response
+        return None
     
     def register_music_in_playlist(self, connection: sqlite3.Connection, playlist_id: int, music_id: int) -> Any:
         return None

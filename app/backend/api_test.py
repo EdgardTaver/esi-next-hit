@@ -163,3 +163,40 @@ def test_endpoint_get_user_music_genres_valid_response():
     assert response.status_code == 200
     assert response.json is not None
     assert response.json == ["pop"]
+
+def test_endpoint_create_playlist_missing_name():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+    
+    response = app.test_client().post("/playlist/create", json={
+        "user_id": 1,
+    })
+
+    assert response.status_code == 400
+
+def test_endpoint_create_playlist_missing_user_id():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+    
+    response = app.test_client().post("/playlist/create", json={
+        "playlist_name": "Cachorro Banana",
+    })
+
+    assert response.status_code == 400
+
+def test_endpoint_create_playlist_valid_response():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+    
+    response = app.test_client().post("/playlist/create", json={
+        "playlist_name": "Cachorro Banana",
+        "user_id": 1,
+    })
+
+    assert response.status_code == 200

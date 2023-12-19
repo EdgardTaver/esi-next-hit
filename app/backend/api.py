@@ -89,7 +89,6 @@ class API:
             playlist_name = request.json.get("playlist_name")
             if not playlist_name:
                 return jsonify({'message': 'Missing playlist_name'}), 400
-            # TODO: test this
 
             self.cmd.register_playlist(connection, playlist_name, user_id)
             return jsonify({'message': 'Playlist created successfully'})
