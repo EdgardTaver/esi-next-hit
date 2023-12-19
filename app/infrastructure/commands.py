@@ -207,11 +207,41 @@ def list_music_ids_for_user(connection: sqlite3.Connection, user_id: int) -> Lis
 
     return results
 
-def get_random_new_musics_for_user(connection: sqlite3.Connection, user_id: int):
-    cursor = connection.cursor()
-
+def get_music_recommendations_for_user(connection: sqlite3.Connection, user_id: int):
     genre_list = list_genres_for_user(connection, user_id)
     known_music_ids = list_music_ids_for_user(connection, user_id)
+
+    if len(genre_list) == 0 or len(known_music_ids) == 0:
+        return _get_any_random_musics(
+            connection)
+        # get any 5 random musics
+        # since we only know the user tastes by the musics in their playlists
+        # if there are no playlists, then the user is totally new and a random
+        # guess is our best guess
+
+    else:
+        return _get_random_new_musics_for_the_genres_the_user_listens_to(
+            connection, genre_list, known_music_ids)
+
+def _get_any_random_musics(connection: sqlite3.Connection):
+    cursor = connection.cursor()
+
+    select_statement = """
+    SELECT * FROM musics
+    ORDER BY RANDOM()
+    LIMIT 5
+    """
+
+    cursor.execute(select_statement)
+
+    names = [description[0] for description in cursor.description]
+    results = [dict(zip(names, row)) for row in cursor.fetchall()]
+    cursor.close()
+
+    return results
+
+def _get_random_new_musics_for_the_genres_the_user_listens_to(connection: sqlite3.Connection, genre_list: List[str], known_music_ids: List[int]):
+    cursor = connection.cursor()
 
     select_statement = """
     SELECT * FROM musics

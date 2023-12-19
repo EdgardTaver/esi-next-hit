@@ -7,7 +7,7 @@ from app.exceptions import (EmailAlreadyRegisteredException,
                             PlaylistAlreadyExistsException,
                             PlaylistNotFoundException)
 from app.infrastructure.commands import (get_authenticated_user_id,
-                                         get_random_new_musics_for_user,
+                                         get_music_recommendations_for_user,
                                          list_genres_for_user,
                                          list_music_ids_for_user,
                                          list_musics_in_playlist,
@@ -582,7 +582,7 @@ def test_list_music_ids_for_user_no_musics_for_user():
 
     connection.close()
 
-def test_get_random_new_musics_for_user():
+def test_get_music_recommendations_for_user_regular_scenario():
     connection = start_sqlite_in_memory_database_connection()
     create_playlists_table(connection)
     create_music_table(connection)
@@ -614,12 +614,39 @@ def test_get_random_new_musics_for_user():
     register_music_in_playlist(connection, playlist_id_2, music_id_2)
 
 
-    result = get_random_new_musics_for_user(connection, user_id)
+    result = get_music_recommendations_for_user(connection, user_id)
     assert len(result) == 2
 
     assert result[0]["id"] == music_id_3 or result[0]["id"] == music_id_4
     assert result[1]["id"] == music_id_3 or result[1]["id"] == music_id_4
     # music id 5 contains a genre that is not in any playlist of the user
     # musics already in playlist should not be returned
+
+    connection.close()
+
+def test_get_music_recommendations_for_user_when_user_has_no_playlist():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_music_table(connection)
+    create_playlist_music_table(connection)
+
+    music_id_1 = register_music(connection, "Stop the music!", "The Dogs", "electronic music", "url/image_3")
+    assert music_id_1 is not None
+
+    music_id_2 = register_music(connection, "Seven Nation Army", "The White Stripes", "norwegian black metal", "url/image_4")
+    assert music_id_2 is not None
+
+    music_id_3 = register_music(connection, "Numb", "Linkin Park", "nu metal", "url/image_5")
+    assert music_id_3 is not None
+    
+    user_id = 1
+
+    result = get_music_recommendations_for_user(connection, user_id)
+    assert len(result) == 3
+
+    sorted_result_music_ids = sorted([result[0]["id"], result[1]["id"], result[2]["id"]])
+    assert sorted_result_music_ids == [music_id_1, music_id_2, music_id_3]
+    # user has no know tastes, any music can be recommended
+    # the sorting is to ensure the test is deterministic
 
     connection.close()
