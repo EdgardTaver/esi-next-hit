@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 
-from app.exceptions import (EmailAlreadyRegisteredException,
+from app.backend.exceptions import (EmailAlreadyRegisteredException,
                             MusicAlreadyInPlaylistException,
                             MusicNotFoundException,
                             PlaylistAlreadyExistsException,

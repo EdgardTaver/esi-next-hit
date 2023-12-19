@@ -1,7 +1,7 @@
 import sqlite3
 from typing import Optional
 
-from app.config import DATABASE_FILE
+from app.backend.config import DATABASE_FILE
 
 
 def start_users_database_connection() -> sqlite3.Connection:

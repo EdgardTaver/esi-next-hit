@@ -1,7 +1,7 @@
 import sqlite3
 from typing import Any, Dict, List, Optional
 
-from app.exceptions import (EmailAlreadyRegisteredException,
+from app.backend.exceptions import (EmailAlreadyRegisteredException,
                             MusicAlreadyInPlaylistException,
                             MusicNotFoundException,
                             PlaylistAlreadyExistsException,

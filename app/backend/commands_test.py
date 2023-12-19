@@ -1,7 +1,7 @@
 
 import pytest
 
-from app.exceptions import (EmailAlreadyRegisteredException,
+from app.backend.exceptions import (EmailAlreadyRegisteredException,
                             MusicAlreadyInPlaylistException,
                             MusicNotFoundException,
                             PlaylistAlreadyExistsException,
@@ -19,7 +19,7 @@ from app.backend.database import (create_music_table,
                                          create_playlist_music_table,
                                          create_playlists_table,
                                          create_users_table, register_music)
-from app.testing import start_sqlite_in_memory_database_connection
+from app.backend.testing import start_sqlite_in_memory_database_connection
 
 
 def test_register_user_when_email_is_new():

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from app.config import MUSICS_CSV_FILE
+from app.backend.config import MUSICS_CSV_FILE
 from app.backend.database import (create_music_table,
                                          create_playlist_music_table,
                                          create_playlists_table,
