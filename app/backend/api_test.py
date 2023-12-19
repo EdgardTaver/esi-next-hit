@@ -239,3 +239,19 @@ def test_endpoint_add_music_to_playlist_valid_response():
 
     assert response.status_code == 200
     assert cmd.register_music_in_playlist_called
+
+def test_endpoint_show_playlist():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    cmd.list_musics_in_playlist_response = [{"name": "Cachorro Banana"}]
+
+    playlist_id = 1
+    response = app.test_client().get(f"/playlist/{playlist_id}/show")
+
+    assert response.status_code == 200
+    assert response.json is not None
+    assert len(response.json) == 1
+    assert response.json[0]["name"] == "Cachorro Banana"
