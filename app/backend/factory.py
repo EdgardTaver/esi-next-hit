@@ -11,6 +11,7 @@ from app.backend.commands import (get_any_random_musics,
                                   register_playlist, register_user,
                                   search_music)
 from app.backend.database import start_users_database_connection
+from app.backend.testing import start_sqlite_in_memory_database_connection
 
 
 class Commands:
@@ -54,3 +55,12 @@ class Commands:
     
     def list_genres_for_user(self, connection: sqlite3.Connection, user_id: int) -> Any:
         return list_genres_for_user(connection, user_id)
+
+class MockedCommands(Commands):
+    get_authenticated_user_id_response: Any
+
+    def start_users_database_connection(self) -> sqlite3.Connection:
+        return start_sqlite_in_memory_database_connection()
+
+    def get_authenticated_user_id(self, connection: sqlite3.Connection, email: str, password: str) -> Dict[str, Any]:
+        return self.get_authenticated_user_id_response

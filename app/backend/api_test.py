@@ -1,15 +1,63 @@
 from flask import Flask
 
-from app.backend.api import register_endpoints
+from app.backend.api import API, register_endpoints
+from app.backend.factory import MockedCommands
+from app.backend.database import database_setup
 
 
-def test_endpoint_login():
+def test_endpoint_login_missing_email():
     app = Flask(__name__)
-    register_endpoints(app)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+    
+    response = app.test_client().post("/user/login", json={
+        "password": "123456",
+    })
+
+    assert response.status_code == 400
+
+def test_endpoint_login_missing_password():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
     
     response = app.test_client().post("/user/login", json={
         "email": "cachorro@banana.com",
-        "password": "123456"
+    })
+
+    assert response.status_code == 400
+
+def test_endpoint_login_invalid_response():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    cmd.get_authenticated_user_id_response = {}
+    
+    response = app.test_client().post("/user/login", json={
+        "email": "cachorro@banana.com",
+        "password": "123456",
+    })
+
+    assert response.status_code == 401
+
+def test_endpoint_login_valid_response():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    cmd.get_authenticated_user_id_response = {
+        "user_id": 1,
+        "name": "Cachorro Banana",
+    }
+    
+    response = app.test_client().post("/user/login", json={
+        "email": "cachorro@banana.com",
+        "password": "123456",
     })
 
     assert response.status_code == 200
