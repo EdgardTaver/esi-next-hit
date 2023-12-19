@@ -10,7 +10,7 @@ from app.infrastructure.commands import (get_any_random_musics, get_authenticate
                                          list_playlists_for_user,
                                          register_music_in_playlist,
                                          register_playlist, register_user,
-                                         search_music, get_music_recommendations_for_user)
+                                         search_music, get_music_recommendations_for_user, list_genres_for_user)
 from app.infrastructure.database import start_users_database_connection
 
 app = Flask(__name__)
@@ -62,6 +62,23 @@ def endpoint_register():
     
     except EmailAlreadyRegisteredException:
         return jsonify({'message': 'Email already registered'}), 400
+    
+    finally:
+        connection.close()
+
+@app.route("/user/music-genres", methods=["POST"]) # type:ignore
+def endpoint_get_user_music_genres():
+    connection = start_users_database_connection()
+    try:
+        user_id = request.json.get("user_id")
+        if not user_id:
+            return jsonify({'message': 'Missing user_id'}), 400
+        
+        result = list_genres_for_user(connection, user_id)
+        return jsonify(result)
+    
+    except Exception:
+        return jsonify({'message': 'Unexpected issue'}), 500
     
     finally:
         connection.close()

@@ -1,6 +1,6 @@
 import streamlit as st
 
-from app.frontend.bff import (do_create_playlist, do_list_playlists, do_login,
+from app.frontend.bff import (do_create_playlist, do_get_user_genres, do_list_playlists, do_login,
                               do_logout, do_register, do_get_random_music_recommendations,
                               do_show_playlist)
 from app.frontend.components import add_to_playlist_button, list_musics, music_search_box
@@ -94,9 +94,15 @@ def profile_section():
         st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT] = False
     
     if st.session_state[SESSION_USER_ID] is not None :
-        
+        st.subheader("Seu perfil")
+
         st.write("Olá!")
-        # TODO: add more info
+        
+        genres = do_get_user_genres(st.session_state[SESSION_USER_ID])
+        if len(genres) > 0:
+            st.subheader("Seus gêneros favoritos")
+            for genre in genres:
+                st.write(genre)
 
         logout = st.button(key="logout", label="Logout")
         if logout:
