@@ -200,3 +200,31 @@ def test_endpoint_create_playlist_valid_response():
     })
 
     assert response.status_code == 200
+
+def test_endpoint_list_playlists_missing_user_id():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+    
+    response = app.test_client().post("/playlist/list", json={
+    })
+
+    assert response.status_code == 400
+
+def test_endpoint_list_playlists_valid_response():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    cmd.list_playlists_for_user_response = [{"name": "Melhores do Ano"}]
+
+    response = app.test_client().post("/playlist/list", json={
+        "user_id": 1,
+    })
+
+    assert response.status_code == 200
+    assert response.json is not None
+    assert len(response.json) == 1
+    assert response.json[0]["name"] == "Melhores do Ano"

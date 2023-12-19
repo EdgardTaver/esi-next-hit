@@ -60,6 +60,7 @@ class MockedCommands(Commands):
     get_authenticated_user_id_response: Any
     register_user_response: Any
     list_genres_for_user_response: Any
+    list_playlists_for_user_response: Any
 
 
     def start_users_database_connection(self) -> sqlite3.Connection:
@@ -93,4 +94,4 @@ class MockedCommands(Commands):
         return self.list_genres_for_user_response
     
     def list_playlists_for_user(self, connection: sqlite3.Connection, user_id: int) -> Any:
-        return None
+        return self.list_playlists_for_user_response
