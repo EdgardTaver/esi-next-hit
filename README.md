@@ -18,7 +18,7 @@ python -m venv venv
 ```
 
 ```bash
-source .venv/bin/activate
+source ./venv/bin/activate
 # unix
 ```
 
