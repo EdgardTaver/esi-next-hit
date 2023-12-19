@@ -1,7 +1,9 @@
 import sqlite3
 from typing import Optional
 
-from app.backend.config import DATABASE_FILE
+import pandas as pd
+
+from app.backend.config import DATABASE_FILE, MUSICS_CSV_FILE
 
 
 def start_users_database_connection() -> sqlite3.Connection:
@@ -95,3 +97,25 @@ def create_playlist_music_table(connection: sqlite3.Connection):
     
     cursor.close()
     connection.commit()
+
+def database_setup(connection: sqlite3.Connection):
+    create_users_table(connection)
+    create_music_table(connection)
+    create_playlists_table(connection)
+    create_playlist_music_table(connection)
+
+def database_fill_up_musics_table(connection: sqlite3.Connection):
+    cursor = connection.cursor()
+
+    select_musics = """
+    SELECT COUNT(*) FROM musics
+    """
+
+    cursor.execute(select_musics)
+    musics_count = cursor.fetchone()[0]
+
+    if musics_count == 0:
+        musics_df = pd.read_csv(MUSICS_CSV_FILE)
+        musics_df.to_sql("musics", connection, if_exists="append", index=False)
+
+    cursor.close()
