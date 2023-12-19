@@ -11,12 +11,10 @@ SESSION_CLEAR_SEARCH_RESULTS = "should_clear_search_results"
 
 def initialize_session_variables():
     if SESSION_USER_ID not in st.session_state:
-        st.session_state[SESSION_USER_ID] = 5
-        # TODO: TEMP!!!
+        st.session_state[SESSION_USER_ID] = None
 
     if SESSION_USER_NAME not in st.session_state:
-        st.session_state[SESSION_USER_NAME] = "Banana"
-        # TODO: TEMP!!!
+        st.session_state[SESSION_USER_NAME] = None
 
     if SESSION_SHOULD_DISPLAY_LOGIN not in st.session_state:
         st.session_state[SESSION_SHOULD_DISPLAY_LOGIN] = False
