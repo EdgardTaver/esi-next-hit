@@ -97,6 +97,10 @@ def profile_section():
         st.subheader("Seu perfil")
 
         st.write("Olá!")
+        logout = st.button(key="logout", label="Logout")
+        if logout:
+            st.session_state[SESSION_USER_ID] = None
+            st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT] = True
         
         genres = do_get_user_genres(st.session_state[SESSION_USER_ID])
         if len(genres) > 0:
@@ -104,11 +108,6 @@ def profile_section():
             for genre in genres:
                 st.write(genre)
 
-        logout = st.button(key="logout", label="Logout")
-        if logout:
-            st.session_state[SESSION_USER_ID] = None
-            st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT] = True
-    
     else:
         with st.form(key="login_form"):
             st.subheader("Faça login para acessar seu perfil")
