@@ -6,7 +6,7 @@ from app.exceptions import (EmailAlreadyRegisteredException,
                             MusicNotFoundException,
                             PlaylistAlreadyExistsException,
                             PlaylistNotFoundException)
-from app.infrastructure.commands import (get_authenticated_user_id,
+from app.backend.commands import (get_authenticated_user_id,
                                          get_music_recommendations_for_user,
                                          list_genres_for_user,
                                          list_music_ids_for_user,
@@ -15,7 +15,7 @@ from app.infrastructure.commands import (get_authenticated_user_id,
                                          register_music_in_playlist,
                                          register_playlist, register_user,
                                          search_music)
-from app.infrastructure.database import (create_music_table,
+from app.backend.database import (create_music_table,
                                          create_playlist_music_table,
                                          create_playlists_table,
                                          create_users_table, register_music)

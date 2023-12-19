@@ -5,13 +5,13 @@ from app.exceptions import (EmailAlreadyRegisteredException,
                             MusicNotFoundException,
                             PlaylistAlreadyExistsException,
                             PlaylistNotFoundException)
-from app.infrastructure.commands import (get_any_random_musics, get_authenticated_user_id,
+from app.backend.commands import (get_any_random_musics, get_authenticated_user_id,
                                          list_musics_in_playlist,
                                          list_playlists_for_user,
                                          register_music_in_playlist,
                                          register_playlist, register_user,
                                          search_music, get_music_recommendations_for_user, list_genres_for_user)
-from app.infrastructure.database import start_users_database_connection
+from app.backend.database import start_users_database_connection
 
 def register_endpoints(app: Flask):
     app.add_url_rule("/user/login", view_func=endpoint_login, methods=['POST'])

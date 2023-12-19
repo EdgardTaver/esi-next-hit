@@ -6,7 +6,7 @@ from app.exceptions import (EmailAlreadyRegisteredException,
                             MusicNotFoundException,
                             PlaylistAlreadyExistsException,
                             PlaylistNotFoundException)
-from app.infrastructure.password import encrypt_password
+from app.backend.password import encrypt_password
 
 
 def register_user(connection: sqlite3.Connection, email: str, password: str, name:str) -> Optional[int]:

@@ -1,5 +1,5 @@
 from flask import Flask
-from app.infrastructure.api import register_endpoints
+from app.backend.api import register_endpoints
 
 if __name__ == "__main__":
     app = Flask(__name__)

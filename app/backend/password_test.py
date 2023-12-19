@@ -1,4 +1,4 @@
-from app.infrastructure.password import encrypt_password
+from app.backend.password import encrypt_password
 
 def test_encrypt_password():
     password = "cachorro_bananinha"
