@@ -97,22 +97,24 @@ def profile_section():
         st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT] = False
     
     if st.session_state[SESSION_USER_ID] is not None :
-        st.subheader("Seu perfil")
+
+        col1, col2 = st.columns((1,2.75))
+        col1.image("axolote.jpg", width=150)
 
         user_name = st.session_state[SESSION_USER_NAME]
-        st.write(f"Olá, {user_name}!")
+        col2.subheader("Seu perfil")
+        col2.write(f"Olá, {user_name}!")
 
-        logout = st.button(key="logout", label="Logout")
-        if logout:
+        if col2.button(key="logout", label="Logout"):
             st.session_state[SESSION_USER_ID] = None
             st.session_state[SESSION_USER_NAME] = None
             st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT] = True
         
         genres = do_get_user_genres(st.session_state[SESSION_USER_ID])
         if len(genres) > 0:
-            st.subheader("Seus gêneros favoritos")
+            col2.subheader("Seus gêneros favoritos")
             for genre in genres:
-                st.write(genre)
+                col2.write(genre)
 
     else:
         with st.form(key="login_form"):
