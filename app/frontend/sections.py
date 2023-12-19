@@ -97,15 +97,11 @@ def profile_section():
         
         st.write("Olá!")
         # TODO: add more info
+
         logout = st.button(key="logout", label="Logout")
         if logout:
-            response = do_logout()
-            # TODO: just do it directly
-            if not response:
-                st.error("Erro ao fazer logout")
-            else:
-                st.session_state[SESSION_USER_ID] = None
-                st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT] = True
+            st.session_state[SESSION_USER_ID] = None
+            st.session_state[SESSION_SHOULD_DISPLAY_LOGOUT] = True
     
     else:
         with st.form(key="login_form"):
