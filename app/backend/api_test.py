@@ -2,7 +2,6 @@ from flask import Flask
 
 from app.backend.api import API, register_endpoints
 from app.backend.factory import MockedCommands
-from app.backend.database import database_setup
 
 
 def test_endpoint_login_missing_email():

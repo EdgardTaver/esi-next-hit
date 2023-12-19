@@ -10,6 +10,7 @@ from app.backend.commands import (get_any_random_musics,
                                   register_music_in_playlist,
                                   register_playlist, register_user,
                                   search_music)
+from app.backend.config import TEST_DATABASE_FILE
 from app.backend.database import start_users_database_connection
 from app.backend.testing import start_sqlite_in_memory_database_connection
 
@@ -104,3 +105,9 @@ class MockedCommands(Commands):
     
     def list_playlists_for_user(self, connection: sqlite3.Connection, user_id: int) -> Any:
         return self.list_playlists_for_user_response
+
+
+class E2ETestCommands(Commands):
+    def start_users_database_connection(self) -> sqlite3.Connection:
+        conn = sqlite3.connect(TEST_DATABASE_FILE)
+        return conn
