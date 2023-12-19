@@ -28,7 +28,8 @@ def test_register_user_when_email_is_new():
 
     new_email = "test@example.com"
     new_password = "password123"
-    exercise = register_user(connection, new_email, new_password)
+    new_name = "Test User"
+    exercise = register_user(connection, new_email, new_password, new_name)
     assert exercise == 1
 
     cursor = connection.cursor()
@@ -36,7 +37,8 @@ def test_register_user_when_email_is_new():
     result = cursor.fetchone()
 
     assert result is not None
-    assert result[1] == new_email
+    assert result[1] == new_name
+    assert result[2] == new_email
 
     cursor.close()
     connection.close()
@@ -47,12 +49,13 @@ def test_register_user_when_email_already_exists():
 
     existing_email = "test@example.com"
     existing_password = "password123"
-    register_user(connection, existing_email, existing_password)
+    existing_name = "Test User"
+    register_user(connection, existing_email, existing_password, existing_name)
 
     new_password = "password456"
 
     with pytest.raises(EmailAlreadyRegisteredException):
-        register_user(connection, existing_email, new_password)
+        register_user(connection, existing_email, new_password, existing_name)
 
     cursor = connection.cursor()
     cursor.execute("SELECT COUNT(*) FROM users WHERE email=?", (existing_email,))
@@ -69,7 +72,8 @@ def test_get_authenticated_user_id_when_email_is_not_registered():
 
     existing_email = "test@example.com"
     existing_password = "password123"
-    register_user(connection, existing_email, existing_password)
+    existing_name = "Test User"
+    register_user(connection, existing_email, existing_password, existing_name)
 
     non_existing_email = "cachorro@banana.com"
     any_password = "password456"
@@ -85,7 +89,8 @@ def test_get_authenticated_user_id_when_email_exists_but_password_is_incorrect()
 
     existing_email = "test@example.com"
     existing_password = "password123"
-    register_user(connection, existing_email, existing_password)
+    existing_name = "Test User"
+    register_user(connection, existing_email, existing_password, existing_name)
 
     wrong_password = "cachorro_banana"
     result = get_authenticated_user_id(connection, existing_email, wrong_password)
@@ -97,11 +102,13 @@ def test_get_authenticated_user_id_when_email_exists_and_password_is_correct():
 
     existing_email_user_1 = "test@example.com"
     existing_password_user_1 = "password123"
-    register_user(connection, existing_email_user_1, existing_password_user_1)
+    existing_name_1 = "Test User"
+    register_user(connection, existing_email_user_1, existing_password_user_1, existing_name_1)
 
     existing_email_user_2 = "test_222@example.com"
     existing_password_user_2 = "password456"
-    register_user(connection, existing_email_user_2, existing_password_user_2)
+    existing_name_2 = "Test User"
+    register_user(connection, existing_email_user_2, existing_password_user_2, existing_name_2)
 
     result = get_authenticated_user_id(connection, existing_email_user_2, existing_password_user_2)
     assert result == 2

@@ -1,7 +1,7 @@
 import streamlit as st
 
 from app.frontend.bff import (do_create_playlist, do_get_user_genres, do_list_playlists, do_login,
-                              do_logout, do_register, do_get_random_music_recommendations,
+                              do_register, do_get_random_music_recommendations,
                               do_show_playlist)
 from app.frontend.components import add_to_playlist_button, list_musics, music_search_box
 from app.frontend.session import (SESSION_CLEAR_SEARCH_RESULTS,

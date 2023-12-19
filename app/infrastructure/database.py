@@ -16,6 +16,7 @@ def create_users_table(connection: sqlite3.Connection):
     CREATE TABLE IF NOT EXISTS
     users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
         email TEXT,
         password TEXT
     )

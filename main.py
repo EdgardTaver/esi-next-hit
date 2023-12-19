@@ -53,12 +53,21 @@ def endpoint_logout():
 @app.route("/user/register", methods=['POST']) # type:ignore
 def endpoint_register():
     email = request.json.get("email")
+    if not email:
+        return jsonify({'message': 'Missing email'}), 400
+
     password = request.json.get("password")
+    if not password:
+        return jsonify({'message': 'Missing password'}), 400
+    
+    name = request.json.get("name")
+    if not name:
+        return jsonify({'message': 'Missing name'}), 400
 
     connection = start_users_database_connection()
     try:
         user_id = register_user(connection, email, password)
-        return jsonify({'message': 'User registered successfully', 'user_id': user_id})
+        return jsonify({'message': 'User registered successfully', 'user_id': user_id, 'name': name})
     
     except EmailAlreadyRegisteredException:
         return jsonify({'message': 'Email already registered'}), 400
