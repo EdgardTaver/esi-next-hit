@@ -282,3 +282,45 @@ def test_endpoint_search_music_valid_response():
     assert response.json is not None
     assert len(response.json) == 1
     assert response.json[0]["name"] == "Cachorro Banana"
+
+def test_endpoint_get_music_recommendations_missing_user_id():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    response = app.test_client().post("/music/recommendations", json={})
+
+    assert response.status_code == 400
+
+def test_endpoint_get_music_recommendations_valid_response():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    cmd.get_music_recommendations_for_user_response = [{"name": "Cachorro Banana"}]
+
+    response = app.test_client().post("/music/recommendations", json={
+        "user_id": 1,
+    })
+
+    assert response.status_code == 200
+    assert response.json is not None
+    assert len(response.json) == 1
+    assert response.json[0]["name"] == "Cachorro Banana"
+
+def test_endpoint_get_music_random_recommendations():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    cmd.get_any_random_musics_response = [{"name": "Cachorro Banana"}]
+
+    response = app.test_client().get("/music/random-recommendations")
+
+    assert response.status_code == 200
+    assert response.json is not None
+    assert len(response.json) == 1
+    assert response.json[0]["name"] == "Cachorro Banana"

@@ -173,9 +173,10 @@ class API:
                 return jsonify({'message': 'Missing user_id'}), 400
             
             results = self.cmd.get_music_recommendations_for_user(connection, user_id)
-            return results
+            return jsonify(results)
         
-        except Exception:
+        except Exception as e:
+            print(e)
             return jsonify({'message': 'Unexpected issue'}), 500
 
         finally:
