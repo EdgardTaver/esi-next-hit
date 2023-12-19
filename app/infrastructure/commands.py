@@ -207,3 +207,30 @@ def list_music_ids_for_user(connection: sqlite3.Connection, user_id: int) -> Lis
 
     return results
 
+def get_random_new_musics_for_user(connection: sqlite3.Connection, user_id: int):
+    cursor = connection.cursor()
+
+    genre_list = list_genres_for_user(connection, user_id)
+    known_music_ids = list_music_ids_for_user(connection, user_id)
+
+    select_statement = """
+    SELECT * FROM musics
+    WHERE 1=1
+    AND genre IN ({})
+    AND id NOT IN ({})
+    ORDER BY RANDOM()
+    LIMIT 5
+    """
+
+    formatted_genre_list = ','.join('?' * len(genre_list))
+    formatted_known_music_ids = ','.join('?' * len(known_music_ids))
+
+    cursor.execute(
+        select_statement.format(formatted_genre_list, formatted_known_music_ids),
+        genre_list + known_music_ids)
+
+    names = [description[0] for description in cursor.description]
+    results = [dict(zip(names, row)) for row in cursor.fetchall()]
+    cursor.close()
+
+    return results
