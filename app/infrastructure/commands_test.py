@@ -11,7 +11,7 @@ from app.infrastructure.commands import (get_authenticated_user_id,
                                          list_playlists_for_user,
                                          register_music_in_playlist,
                                          register_playlist, register_user,
-                                         search_music)
+                                         search_music, list_genres_for_user)
 from app.infrastructure.database import (create_music_table,
                                          create_playlist_music_table,
                                          create_playlists_table,
@@ -412,3 +412,86 @@ def test_search_music_case_insensitivity():
     assert results[0]["title"] == "Sorry"
     assert results[1]["title"] == "SORRY"
     assert results[2]["title"] == "sorry"
+
+def test_list_genres_for_user_regular_scenario():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_music_table(connection)
+    create_playlist_music_table(connection)
+
+    user_id = 1
+    
+    playlist_id_1 = register_playlist(connection, "Dogs 1", user_id)
+    assert playlist_id_1 is not None
+
+    music_id_1 = register_music(connection, "Sorry", "Justin Bieber", "norwegian black metal", "url/image_1")
+    assert music_id_1 is not None
+
+    register_music_in_playlist(connection, playlist_id_1, music_id_1)
+
+    playlist_id_2 = register_playlist(connection, "Banana 2", user_id)
+    assert playlist_id_2 is not None
+
+    music_id_2 = register_music(connection, "Calabasas", "Tritonal", "electronic music", "url/image_2")
+    assert music_id_2 is not None
+
+    register_music_in_playlist(connection, playlist_id_2, music_id_2)
+
+    result = list_genres_for_user(connection, user_id)
+    assert result == ["electronic music", "norwegian black metal"]
+
+    connection.close()
+
+def test_list_genres_for_user_different_users():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_music_table(connection)
+    create_playlist_music_table(connection)
+
+    user_id_1 = 1
+    
+    playlist_id_1 = register_playlist(connection, "Dogs 1", user_id_1)
+    assert playlist_id_1 is not None
+
+    music_id_1 = register_music(connection, "Sorry", "Justin Bieber", "norwegian black metal", "url/image_1")
+    assert music_id_1 is not None
+
+    register_music_in_playlist(connection, playlist_id_1, music_id_1)
+
+    user_id_2 = 2
+
+    playlist_id_2 = register_playlist(connection, "Banana 2", user_id_2)
+    assert playlist_id_2 is not None
+
+    music_id_2 = register_music(connection, "Calabasas", "Tritonal", "electronic music", "url/image_2")
+    assert music_id_2 is not None
+
+    register_music_in_playlist(connection, playlist_id_2, music_id_2)
+
+    result = list_genres_for_user(connection, user_id_1)
+    assert result == ["norwegian black metal"]
+
+    connection.close()
+
+def test_list_genres_for_user_no_musics_for_user():
+    connection = start_sqlite_in_memory_database_connection()
+    create_playlists_table(connection)
+    create_music_table(connection)
+    create_playlist_music_table(connection)
+
+    existing_user_id = 1
+    
+    playlist_id = register_playlist(connection, "Dogs 1", existing_user_id)
+    assert playlist_id is not None
+
+    music_id = register_music(connection, "Sorry", "Justin Bieber", "norwegian black metal", "url/image_1")
+    assert music_id is not None
+
+    register_music_in_playlist(connection, playlist_id, music_id)
+
+    non_existing_user_id = 2
+
+    result = list_genres_for_user(connection, non_existing_user_id)
+    assert len(result) == 0
+
+    connection.close()

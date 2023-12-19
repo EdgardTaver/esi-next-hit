@@ -1,5 +1,5 @@
 import sqlite3
-from typing import Optional
+from typing import List, Optional
 
 from app.exceptions import (EmailAlreadyRegisteredException,
                             MusicAlreadyInPlaylistException,
@@ -147,7 +147,13 @@ def list_musics_in_playlist(connection: sqlite3.Connection, playlist_id: int):
     cursor.close()
     return results
 
-
+def list_suggestions_for_user():
+    """
+    SELECT * FROM musics
+    INNER JOIN playlist_music ON musics.id=playlist_music.music_id
+    INNER JOIN playlists ON playlist_music.playlist_id=playlists.id
+    WHERE playlists.user_id=?
+    """
 
 def search_music(connection: sqlite3.Connection, search_string: str):
     cursor = connection.cursor()
@@ -163,4 +169,22 @@ def search_music(connection: sqlite3.Connection, search_string: str):
     results = [dict(zip(names, row)) for row in cursor.fetchall()]
 
     cursor.close()
+    return results
+
+def list_genres_for_user(connection: sqlite3.Connection, user_id: int) -> List[str]:
+    cursor = connection.cursor()
+
+    select_statement = """
+    SELECT distinct(musics.genre) FROM musics
+    INNER JOIN playlist_music ON musics.id=playlist_music.music_id
+    INNER JOIN playlists ON playlist_music.playlist_id=playlists.id
+    WHERE playlists.user_id=?
+    ORDER BY 1 ASC
+    """
+
+    cursor.execute(select_statement, (user_id,))
+
+    results = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+
     return results
