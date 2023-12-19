@@ -136,12 +136,14 @@ def profile_section():
 
             email = st.text_input("Email")
             password = st.text_input("Password", type="password")
+            name = st.text_input("Nome")
 
             submitted = st.form_submit_button("Cadastrar")
             if submitted:
-                register_response = do_register(email, password)
+                register_response = do_register(email, password, name)
                 if not register_response:
                     st.error("E-mail já cadastrado.")
                 else:
-                    st.session_state[SESSION_USER_ID] = register_response
+                    st.session_state[SESSION_USER_ID] = register_response["user_id"]
+                    st.session_state[SESSION_USER_NAME] = register_response["name"]
                     st.session_state[SESSION_SHOULD_DISPLAY_LOGIN] = True

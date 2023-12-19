@@ -42,14 +42,14 @@ def do_login(email: str, password: str) -> Optional[Dict[str, Any]]:
     
     return response.json()
 
-def do_register(email: str, password: str) -> Optional[int]:
-    payload = {"email": email, "password": password}
+def do_register(email: str, password: str, name: str) -> Optional[Dict[str, Any]]:
+    payload = {"email": email, "password": password, "name": name}
     response = requests.post(REGISTER_ENDPOINT, json=payload)
     
     if response.status_code != 200:
         return None
     
-    return response.json()["user_id"]
+    return response.json()
 
 def do_logout() -> bool:
     response = requests.get(LOGOUT_ENDPOINT)
