@@ -1,3 +1,4 @@
+from typing import Dict, Any
 from flask import Flask, jsonify, request
 
 from app.backend.exceptions import (EmailAlreadyRegisteredException,
@@ -13,6 +14,8 @@ from app.backend.commands import (get_any_random_musics, get_authenticated_user_
                                          search_music, get_music_recommendations_for_user, list_genres_for_user)
 from app.backend.database import start_users_database_connection
 
+from app.backend.factory import Commands
+
 def register_endpoints(app: Flask):
     app.add_url_rule("/user/login", view_func=endpoint_login, methods=['POST'])
     app.add_url_rule("/user/register", view_func=endpoint_register, methods=['POST'])
@@ -25,6 +28,8 @@ def register_endpoints(app: Flask):
     app.add_url_rule("/music/recommendations", view_func=endpoint_get_music_recommendations, methods=['POST'])
     app.add_url_rule("/music/random-recommendations", view_func=endpoint_get_music_random_recommendations, methods=['GET'])
 
+cmd = Commands()
+
 def endpoint_login():
     email = request.json.get("email")
     if not email:
@@ -34,9 +39,9 @@ def endpoint_login():
     if not password:
         return jsonify({'message': 'Missing password'}), 400
 
-    connection = start_users_database_connection()
+    connection = cmd.start_users_database_connection()
     try:
-        result = get_authenticated_user_id(connection, email, password)    
+        result = cmd.get_authenticated_user_id(connection, email, password)    
         if len(result) > 0:
             return jsonify({
                 "message": "Login successful",
@@ -45,8 +50,7 @@ def endpoint_login():
         else:
             return jsonify({'message': 'Invalid email or password'}), 401
     
-    except Exception as e:
-        print(e)
+    except Exception:
         return jsonify({'message': 'Unexpected issue'}), 500
 
     finally:
