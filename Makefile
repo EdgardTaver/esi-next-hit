@@ -7,7 +7,14 @@ activate:
 install:
 	pip install -r requirements.txt
 
-setup: venv activate install
+run-setup:
+	python setup.py
+
+run-backend:
+	python backend.py
+
+run-frontend:
+	python -m streamlit run frontend.py
 
 test:
     pytest -v
