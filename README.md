@@ -43,7 +43,7 @@ python backend.py
 Para iniciar o cliente, execute o seguinte comando:
 
 ```bash
-python frontend.py
+python -m streamlit run frontend.py
 ```
 
 # Testes
