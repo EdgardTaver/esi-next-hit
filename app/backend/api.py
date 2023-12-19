@@ -55,9 +55,6 @@ class API:
         connection = self.cmd.start_users_database_connection()
         try:
             user_id = self.cmd.register_user(connection, email, password, name)
-            if user_id is None:
-                return jsonify({'message': 'Unexpected issue'}), 500
-
             return jsonify({'message': 'User registered successfully', 'user_id': user_id, 'name': name})
         
         except EmailAlreadyRegisteredException:

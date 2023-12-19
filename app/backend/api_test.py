@@ -136,3 +136,30 @@ def test_endpoint_register_valid_response():
     assert response.json is not None
     assert response.json["user_id"] == 1
     assert response.json["name"] == "Cachorro Banana"
+
+def test_endpoint_get_user_music_genres_missing_user_id():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+    
+    response = app.test_client().post("/user/music-genres", json={
+    })
+
+    assert response.status_code == 400
+
+def test_endpoint_get_user_music_genres_valid_response():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    cmd.list_genres_for_user_response = ["pop"]
+    
+    response = app.test_client().post("/user/music-genres", json={
+        "user_id": 1,
+    })
+
+    assert response.status_code == 200
+    assert response.json is not None
+    assert response.json == ["pop"]

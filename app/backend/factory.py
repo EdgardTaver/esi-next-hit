@@ -59,6 +59,9 @@ class Commands:
 class MockedCommands(Commands):
     get_authenticated_user_id_response: Any
     register_user_response: Any
+    register_playlist_response: Any
+    list_genres_for_user_response: Any
+
 
     def start_users_database_connection(self) -> sqlite3.Connection:
         return start_sqlite_in_memory_database_connection()
@@ -68,3 +71,27 @@ class MockedCommands(Commands):
 
     def register_user(self, connection: sqlite3.Connection, email: str, password: str, name:str) -> Any:
         return self.register_user_response
+
+    def register_playlist(self, connection: sqlite3.Connection, name: str, user_id: int) -> Any:
+        return self.register_playlist_response
+    
+    def register_music_in_playlist(self, connection: sqlite3.Connection, playlist_id: int, music_id: int) -> Any:
+        return None
+
+    def list_musics_in_playlist(self, connection: sqlite3.Connection, playlist_id: int) -> Any:
+        return None
+    
+    def search_music(self, connection: sqlite3.Connection, search_term: str) -> Any:
+        return None
+    
+    def get_music_recommendations_for_user(self, connection: sqlite3.Connection, user_id: int) -> Any:
+        return None
+    
+    def get_any_random_musics(self, connection: sqlite3.Connection) -> Any:
+        return None
+    
+    def list_genres_for_user(self, connection: sqlite3.Connection, user_id: int) -> Any:
+        return self.list_genres_for_user_response
+    
+    def list_playlists_for_user(self, connection: sqlite3.Connection, user_id: int) -> Any:
+        return None
