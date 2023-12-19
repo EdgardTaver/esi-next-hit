@@ -115,13 +115,9 @@ class API:
         finally:
             connection.close()
 
-    def endpoint_add_music_to_playlist(self, cmd: Commands):
+    def endpoint_add_music_to_playlist(self, playlist_id: int):
         connection = self.cmd.start_users_database_connection()
         try:
-            playlist_id = request.json.get("playlist_id")
-            if not playlist_id:
-                return jsonify({'message': 'Missing playlist id'}), 400
-            
             music_id = request.json.get("music_id")
             if not music_id:
                 return jsonify({'message': 'Missing music_id'}), 400
@@ -141,13 +137,9 @@ class API:
         finally:
             connection.close()
 
-    def endpoint_show_playlist(self):
+    def endpoint_show_playlist(self, playlist_id: int):
         connection = self.cmd.start_users_database_connection()
         try:
-            playlist_id = request.json.get("playlist_id")
-            if not playlist_id:
-                return jsonify({'message': 'Missing playlist id'}), 400
-
             musics = self.cmd.list_musics_in_playlist(connection, playlist_id)
             return jsonify(musics)
         

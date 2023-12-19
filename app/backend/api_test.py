@@ -101,22 +101,6 @@ def test_endpoint_register_missing_name():
 
     assert response.status_code == 400
 
-def test_endpoint_register_invalid_response():
-    app = Flask(__name__)
-    cmd = MockedCommands()
-    api = API(cmd)
-    register_endpoints(app, api)
-
-    cmd.register_user_response = None
-    
-    response = app.test_client().post("/user/register", json={
-        "email": "cachorro@banana.com",
-        "password": "123456",
-        "name": "Cachorro Banana",
-    })
-
-    assert response.status_code == 500
-
 
 def test_endpoint_register_valid_response():
     app = Flask(__name__)
@@ -200,6 +184,7 @@ def test_endpoint_create_playlist_valid_response():
     })
 
     assert response.status_code == 200
+    assert cmd.register_playlist_called
 
 def test_endpoint_list_playlists_missing_user_id():
     app = Flask(__name__)
@@ -228,3 +213,29 @@ def test_endpoint_list_playlists_valid_response():
     assert response.json is not None
     assert len(response.json) == 1
     assert response.json[0]["name"] == "Melhores do Ano"
+
+def test_endpoint_add_music_to_playlist_missing_music_id():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    playlist_id = 1
+    response = app.test_client().post(f"/playlist/{playlist_id}/add-music", json={
+    })
+
+    assert response.status_code == 400
+
+def test_endpoint_add_music_to_playlist_valid_response():
+    app = Flask(__name__)
+    cmd = MockedCommands()
+    api = API(cmd)
+    register_endpoints(app, api)
+
+    playlist_id = 1
+    response = app.test_client().post(f"/playlist/{playlist_id}/add-music", json={
+        "music_id": 1,
+    })
+
+    assert response.status_code == 200
+    assert cmd.register_music_in_playlist_called

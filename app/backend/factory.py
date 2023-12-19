@@ -62,6 +62,9 @@ class MockedCommands(Commands):
     list_genres_for_user_response: Any
     list_playlists_for_user_response: Any
 
+    def __init__(self):
+        self.register_music_in_playlist_called = False
+        self.register_playlist_called = False
 
     def start_users_database_connection(self) -> sqlite3.Connection:
         return start_sqlite_in_memory_database_connection()
@@ -73,9 +76,11 @@ class MockedCommands(Commands):
         return self.register_user_response
 
     def register_playlist(self, connection: sqlite3.Connection, name: str, user_id: int) -> Any:
+        self.register_playlist_called = True
         return None
     
     def register_music_in_playlist(self, connection: sqlite3.Connection, playlist_id: int, music_id: int) -> Any:
+        self.register_music_in_playlist_called = True
         return None
 
     def list_musics_in_playlist(self, connection: sqlite3.Connection, playlist_id: int) -> Any:
